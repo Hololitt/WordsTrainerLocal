@@ -16,6 +16,7 @@ public class LanguageCardCacheService {
         this.userService = userService;
     }
     private final Map<Long, List<LanguageCard>> cachedLanguageCardsByUser = new HashMap<>();
+    private List<LanguageCard> lastLearnedLanguageCards;
 
     public List<LanguageCard> getLanguageCardsByUser() {
         long userId = userService.getUserId();
@@ -30,5 +31,11 @@ public class LanguageCardCacheService {
     public void updateLanguageCardsForUser(long userId) {
         List<LanguageCard> languageCards = languageCardService.getLanguageCardsByUserId(userId);
         cachedLanguageCardsByUser.put(userId, languageCards);
+    }
+    public void setLastLearnedLanguageCards(List<LanguageCard> lastLearnedLanguageCards){
+        this.lastLearnedLanguageCards = lastLearnedLanguageCards;
+    }
+    public List<LanguageCard> getLastLearnedLanguageCards(){
+        return lastLearnedLanguageCards;
     }
 }

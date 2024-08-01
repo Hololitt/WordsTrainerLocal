@@ -11,6 +11,13 @@ public class LanguageCardContextHolder {
 
 private String randomValue;
 private LanguageCard randomLanguageCard;
+private int countCorrectAnswersToFinish = 3;
+public void setCountCorrectAnswersToFinish(int countCorrectAnswersToFinish){
+    this.countCorrectAnswersToFinish = countCorrectAnswersToFinish;
+}
+public int getCountCorrectAnswersToFinish(){
+    return countCorrectAnswersToFinish;
+}
 public void generateRandomValueAndLanguageCard(){
     Random random = new Random();
     boolean chooseWord = random.nextBoolean();
@@ -37,14 +44,14 @@ public List<Integer> getCorrectAnswers(){
         return trueAnswer;
     }
     public boolean isCorrectAnswer(LanguageCard languageCard, String answer, String correctAnswer) {
-        int index = languageCardsToLearn.indexOf(languageCard);
 if(correctAnswers.isEmpty()){
     for(int i = 0; i<languageCardsToLearn.size(); i++){
         correctAnswers.add(i, 0);
     }
 }
-            int currentCorrectAnswers = correctAnswers.get(index);
             if (answer.equals(correctAnswer)) {
+                int index = languageCardsToLearn.indexOf(languageCard);
+                int currentCorrectAnswers = correctAnswers.get(index);
                 currentCorrectAnswers++;
                 correctAnswers.set(index, currentCorrectAnswers);
                 return true;
@@ -54,6 +61,9 @@ if(correctAnswers.isEmpty()){
     }
     public int getCorrectAnswers(LanguageCard languageCard){
         int index = languageCardsToLearn.indexOf(languageCard);
+        if(correctAnswers.isEmpty()){
+            return 0;
+        }
         return correctAnswers.get(index);
     }
 
@@ -67,13 +77,17 @@ if(correctAnswers.isEmpty()){
 
     }
     public void cleanUpContext(){
-    languageCardsToLearn.clear();
-    learnedLanguageCards.clear();
-    correctAnswers.clear();
+    clearList(languageCardsToLearn);
+    clearList(languageCardsToLearn);
+    clearList(correctAnswers);
     randomLanguageCard = null;
     randomValue = null;
     }
-
+    private void clearList(List<?> list) {
+        if (list != null) {
+            list.clear();
+        }
+    }
 public void removeFromLanguageCardsToLearn(LanguageCard languageCard){
         languageCardsToLearn.remove(languageCard);
 }

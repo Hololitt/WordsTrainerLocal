@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Translation input form</title>
+</head>
+<body>
+<form th:action="@{/Home/WordsTrainer/checkAnswer}" th:method="post" th:object="${answer}">
+  <label for="answer">Write translation to: <span th:text="${randomValue}"></span></label>
+  <input type="text" id="answer" th:field="*{answer}" autocomplete="off">
+  <br>
+  <input type="submit" value="Submit">
+</form>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var inputField = document.getElementById('answer');
+    inputField.focus();
+  });
+</script>
+<p>count of correct answers to learn this word: <span th:text="${correctAnswersCount}"></span>/3</p>
+<br/>
+<h4>You learned: <span th:text="${learnedLanguageCardsAmount}"></span>  to learn: <span th:text="${languageCardsToLearnAmount}"></span></h4>
+
+<p id="correctAnswerMessage" class="hidden" th:text="${correctAnswerMessage}"></p>
+<p id="correctAnswer" class="hidden" th:text="${correctAnswer}"></p>
+<p id="incorrectAnswerMessage" class="hidden" th:text="${incorrectAnswerMessage}"></p>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var correctAnswerMessage = document.getElementById('correctAnswerMessage');
+    var correctAnswer = document.getElementById('correctAnswer');
+    var incorrectAnswerMessage = document.getElementById('incorrectAnswerMessage');
+
+    if (correctAnswerMessage.innerText !== '') {
+      setTimeout(function() {
+        correctAnswerMessage.classList.remove('hidden');
+      }, 2000); // Задержка для правильного ответа
+    }
+
+    if (incorrectAnswerMessage.innerText !== '') {
+      setTimeout(function() {
+        incorrectAnswerMessage.classList.remove('hidden');
+        if (correctAnswer.innerText !== '') {
+          correctAnswer.classList.remove('hidden');
+        }
+      }, 4000); // Задержка для неправильного ответа
+    }
+  });
+</script>
+</body>
+</html>

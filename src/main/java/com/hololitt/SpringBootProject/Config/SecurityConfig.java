@@ -39,7 +39,7 @@ public class SecurityConfig{
                 .formLogin(formLogin ->
                         formLogin
                                 .loginPage("/Home/login")
-                                .defaultSuccessUrl("/Home/WordsTrainer")
+                                .defaultSuccessUrl("/Home/showProfile")
                                 .permitAll()
                 )
                 .logout(LogoutConfigurer::permitAll

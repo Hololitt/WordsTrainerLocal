@@ -26,6 +26,6 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String processRegistration(@ModelAttribute("registrationForm") User user) {
         userService.addUser(user);
-        return "redirect:/login";
+        return "redirect:/Home/login";
     }
 }

@@ -39,6 +39,13 @@ private int userId;
         this.mistakesCount = mistakesCount;
         this.repeatCount = repeatCount;
     }
+
+    public LanguageCard(String word, String translation, long userId) {
+        this.word = word;
+        this.translation = translation;
+        this.userId = (int) userId;
+    }
+
     public void setUserId(long userId){
         this.userId = (int) userId;
     }
