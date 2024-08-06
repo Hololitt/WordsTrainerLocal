@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 
 @Configuration
@@ -42,9 +43,10 @@ public class SecurityConfig{
                                 .defaultSuccessUrl("/Home/showProfile")
                                 .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll
+                .logout(LogoutConfigurer::permitAll)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 );
-
         return http.build();
     }
 

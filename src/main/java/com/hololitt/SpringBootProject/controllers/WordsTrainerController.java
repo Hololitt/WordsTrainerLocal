@@ -2,10 +2,8 @@ package com.hololitt.SpringBootProject.controllers;
 
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
 import com.hololitt.SpringBootProject.models.*;
-import com.hololitt.SpringBootProject.services.LanguageCardCacheService;
-import com.hololitt.SpringBootProject.services.LanguageCardService;
-import com.hololitt.SpringBootProject.services.UserService;
-import com.hololitt.SpringBootProject.services.WordsTrainerService;
+import com.hololitt.SpringBootProject.services.*;
+import com.hololitt.SpringBootProject.validators.LanguageCardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,24 +12,34 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/Home/WordsTrainer")
 public class WordsTrainerController {
     private final UserService userService;
     private final LanguageCardService languageCardService;
-    private LanguageCardContextHolder languageCardContextHolder;
+    private final LanguageCardContextHolder languageCardContextHolder;
     private final LanguageCardCacheService languageCardCacheService;
     private final WordsTrainerService wordsTrainerService;
+    private final WordsTrainerSettingsService wordsTrainerSettingsService;
+    private final LanguageCardValidator languageCardValidator;
     @Autowired
     public WordsTrainerController(LanguageCardService languageCardService,
                                   UserService userService,
                                   LanguageCardCacheService languageCardCacheService,
-                                  WordsTrainerService wordsTrainerService){
+                                  WordsTrainerService wordsTrainerService,
+                                  LanguageCardContextHolder languageCardContextHolder,
+                                  WordsTrainerSettingsService wordsTrainerSettingsService,
+                                  LanguageCardValidator languageCardValidator
+                                  ){
         this.languageCardService = languageCardService;
         this.userService = userService;
         this.languageCardCacheService = languageCardCacheService;
         this.wordsTrainerService = wordsTrainerService;
+        this.languageCardContextHolder = languageCardContextHolder;
+        this.wordsTrainerSettingsService = wordsTrainerSettingsService;
+        this.languageCardValidator = languageCardValidator;
     }
     @PostMapping("/submitCreation")
     public String submitCreation(@ModelAttribute("languageCardCreationForm")
@@ -65,7 +73,6 @@ public class WordsTrainerController {
     }
     @GetMapping("/preStart")
     public String preStart(){
-        languageCardContextHolder = wordsTrainerService.getLanguageCardContextHolder();
         List<LanguageCard> languageCardsToLearn = languageCardContextHolder.getLanguageCardsToLearn();
         if(languageCardsToLearn == null){
             return "emptyListException";
@@ -75,7 +82,7 @@ public class WordsTrainerController {
     }
     @GetMapping("/start")
     public String start(Model model){
-        languageCardContextHolder.generateRandomValueAndLanguageCard();
+        wordsTrainerService.setTrainingType();
 
         LanguageCard randomLanguageCard = languageCardContextHolder.getRandomLanguageCard();
         String randomValue = languageCardContextHolder.getRandomValue();
@@ -83,7 +90,10 @@ public class WordsTrainerController {
         int correctAnswersCount = wordsTrainerService.calculateCorrectAnswersCount(randomLanguageCard);
         int languageCardsToLearnAmount = languageCardContextHolder.getLanguageCardsToLearn().size();
         int learnedLanguageCardsAmount = languageCardContextHolder.getLearnedLanguageCards().size();
+        int countCorrectAnswersToFinish = wordsTrainerSettingsService.getSettingsForUser(userService.getUserId())
+                .getCorrectAnswersCountToFinish();
 
+        model.addAttribute("correctAnswersCountToFinish", countCorrectAnswersToFinish);
         model.addAttribute("answer", new TranslationModel());
         model.addAttribute("randomValue", randomValue);
         model.addAttribute("languageCardsToLearnAmount", languageCardsToLearnAmount);
@@ -109,11 +119,17 @@ public class WordsTrainerController {
     @GetMapping("/finish")
     public String finish(Model model){
         List<LanguageCard> languageCardList = languageCardContextHolder.getLearnedLanguageCards();
+        Map<LanguageCard, Integer> mistakesDuringTraining = languageCardContextHolder.getAllMistakesDuringTraining();
+
+        for (LanguageCard languageCard : languageCardList) {
+            System.out.println(mistakesDuringTraining.get(languageCard));
+        }
         model.addAttribute("learnedLanguageCards", languageCardList);
+        model.addAttribute("mistakesDuringTraining", mistakesDuringTraining);
 
         languageCardService.saveLanguageCardList(languageCardList);
-        languageCardCacheService.setLastLearnedLanguageCards(languageCardList);
         languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
+        languageCardCacheService.setLastLearnedLanguageCards(languageCardList);
         return "finish";
     }
     @GetMapping("/repeat")
@@ -136,11 +152,26 @@ public class WordsTrainerController {
         List<LanguageCard> languageCards = languageCardCacheService.getLastLearnedLanguageCards();
       return repeatLanguageCardsOrReturnException(languageCards);
     }
-    private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
-        if (wordsTrainerService.isListValid(languageCards)) {
-            wordsTrainerService.setLanguageCardsToLearn(languageCards);
-            return "redirect:/Home/WordsTrainer/preStart";
-        }
-        return "emptyListException";
+    @PostMapping("/submitSettings")
+    public String submitSettings(@ModelAttribute("wordsTrainerSettings") WordsTrainerSettings wordsTrainerSettings,
+                                 Model model){
+        wordsTrainerSettings.setUserId(userService.getUserId());
+wordsTrainerSettingsService.setAllSettings(wordsTrainerSettings);
+model.addAttribute("successfulSetting", "Your settings was successful saved!");
+return "wordsTrainerSettings";
     }
+    @GetMapping("/settings")
+    public String showSettings(Model model){
+        model.addAttribute("wordsTrainerSettings", new WordsTrainerSettings());
+        return "wordsTrainerSettings";
+    }
+        private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
+            if (languageCardValidator.isLanguageCardListValid(languageCards)) {
+                languageCardContextHolder.cleanUpContext();
+               languageCardContextHolder.setLanguageCardsToLearn(languageCards);
+               languageCardContextHolder.setContext();
+                return "redirect:/Home/WordsTrainer/preStart";
+            }
+            return "emptyListException";
+        }
     }

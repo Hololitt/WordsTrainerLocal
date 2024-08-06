@@ -6,6 +6,7 @@
 </head>
 <body>
 <form th:action="@{/Home/WordsTrainer/checkAnswer}" th:method="post" th:object="${answer}">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
   <label for="answer">Write translation to: <span th:text="${randomValue}"></span></label>
   <input type="text" id="answer" th:field="*{answer}" autocomplete="off">
   <br>
@@ -17,7 +18,7 @@
     inputField.focus();
   });
 </script>
-<p>count of correct answers to learn this word: <span th:text="${correctAnswersCount}"></span>/3</p>
+<p>count of correct answers to learn this word: <span th:text="${correctAnswersCount}"></span>/<span th:text="${correctAnswersCountToFinish}"></span></p>
 <br/>
 <h4>You learned: <span th:text="${learnedLanguageCardsAmount}"></span>  to learn: <span th:text="${languageCardsToLearnAmount}"></span></h4>
 

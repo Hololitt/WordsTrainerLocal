@@ -6,7 +6,9 @@
     <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
 </head>
 <body>
-<a href="/Home/WordsTrainer/languageCards" class="button-successful">my language cards</a>
+<a href="/Home/WordsTrainer/languageCards" class="button-successful">my language cards</a><br><br>
+
+<a href="/Home/WordsTrainer" class="button-successful">Words Trainer</a>
 <br/>
 <h2>Learned language cards during training</h2>
 <table>
@@ -15,7 +17,9 @@
     <td>Translation:  <span th:text="${languageCard.getTranslation()}"></span></td>
     <td>RepeatCount:  <span th:text="${languageCard.getRepeatCount()}"></span></td>
     <td>MistakesCount:  <span th:text="${languageCard.getMistakesCount()}"></span></td>
+        <td>Mistakes count during training: <span th:text="${mistakesDuringTraining.get(languageCard)}"></span></td>
     </tr>
 </table>
+
 </body>
 </html>

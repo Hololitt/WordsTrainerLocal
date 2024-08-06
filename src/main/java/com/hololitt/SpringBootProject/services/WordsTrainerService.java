@@ -1,10 +1,7 @@
 package com.hololitt.SpringBootProject.services;
 
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
-import com.hololitt.SpringBootProject.models.LanguageCard;
-import com.hololitt.SpringBootProject.models.LanguageCardContextHolder;
-import com.hololitt.SpringBootProject.models.LanguageCardCreationForm;
-import com.hololitt.SpringBootProject.models.TranslationModel;
+import com.hololitt.SpringBootProject.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +12,30 @@ import java.util.stream.Collectors;
 @Service
 public class WordsTrainerService {
     private final LanguageCardCacheService languageCardCacheService;
-    private final LanguageCardContextHolder languageCardContextHolder = new LanguageCardContextHolder();
+    private final LanguageCardContextHolder languageCardContextHolder;
+    private final UserService userService;
+    private final WordsTrainerSettingsService wordsTrainerSettingsService;
     @Autowired
-    public WordsTrainerService(LanguageCardCacheService languageCardCacheService) {
+    public WordsTrainerService(LanguageCardCacheService languageCardCacheService,
+                               LanguageCardContextHolder languageCardContextHolder,
+                               UserService userService,
+                               WordsTrainerSettingsService wordsTrainerSettingsService) {
         this.languageCardCacheService = languageCardCacheService;
+        this.languageCardContextHolder = languageCardContextHolder;
+        this.userService = userService;
+        this.wordsTrainerSettingsService = wordsTrainerSettingsService;
     }
-    public LanguageCardContextHolder getLanguageCardContextHolder(){
-        return languageCardContextHolder;
+    private WordsTrainerSettings getWordsTrainerSettingsForUser(){
+        return wordsTrainerSettingsService.getSettingsForUser(userService.getUserId());
+    }
+    public void setTrainingType(){
+        String trainingType = getWordsTrainerSettingsForUser().getTranslationRequestVariety();
+        switch(trainingType){
+            case "mix" -> languageCardContextHolder.generateRandomValueAndLanguageCard();
+            case "word to translation"-> languageCardContextHolder.generateRandomLanguageCardAndTranslation();
+            case "translation to word"-> languageCardContextHolder.generateRandomLanguageCardAndWord();
+            default -> throw new IllegalArgumentException("Unknown training type: " + trainingType);
+        }
     }
 public void createLanguageCard(LanguageCardCreationForm languageCardCreationForm, long userId){
         String word = languageCardCreationForm.getWord();
@@ -35,10 +49,12 @@ public CheckAnswerDTO checkAnswer(TranslationModel translationModel){
     String correctAnswer = languageCardContextHolder.getCorrectAnswer(randomValue, randomLanguageCard);
     if(!languageCardContextHolder.isCorrectAnswer(randomLanguageCard, answer, correctAnswer)){
         randomLanguageCard.incrementMistakesCount();
+        languageCardContextHolder.decrementCorrectAnswersCount(randomLanguageCard);
+        languageCardContextHolder.incrementMistakesCountDuringTraining(randomLanguageCard);
         return new CheckAnswerDTO(false, correctAnswer);
     }
     int correctAnswersCount = languageCardContextHolder.getCorrectAnswers(randomLanguageCard);
-    int correctAnswersCountToFinish = languageCardContextHolder.getCountCorrectAnswersToFinish();
+    int correctAnswersCountToFinish = getWordsTrainerSettingsForUser().getCorrectAnswersCountToFinish();
 
     if(correctAnswersCount == correctAnswersCountToFinish){
         randomLanguageCard.incrementRepeatCount();
@@ -63,17 +79,6 @@ public List<LanguageCard> getRecommendedLanguageCardsToLearn(){
             .sorted(Comparator.comparingInt(LanguageCard::getRepeatCount)).limit(5).collect(Collectors.toList());
     return languageCards;
 }
-    public void setLanguageCardsToLearn(List<LanguageCard> languageCardsToLearn){
-            languageCardContextHolder.cleanUpContext();
-        languageCardContextHolder.setLanguageCardsToLearn(languageCardsToLearn);
-    }
-    public boolean isListValid(List<?> list){
-        if (list == null || list.isEmpty()) {
-            return false;
-        }else{
-            return true;
-        }
-    }
     public int calculateCorrectAnswersCount(LanguageCard randomLanguageCard) {
         if (languageCardContextHolder.getCorrectAnswers().isEmpty()) {
             return 0;
