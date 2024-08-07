@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>MistakePage</title>
+    <style>
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff; /* Цвет фона */
+            color: white; /* Цвет текста */
+            text-decoration: none; /* Убрать подчеркивание */
+            border-radius: 5px; /* Закругленные углы */
+        }
+
+        .button:hover {
+            background-color: #0056b3; /* Цвет фона при наведении */
+        }
+    </style>
+</head>
+<body>
+<h2 th:text="${incorrectAnswerMessage}"></h2>
+
+<h2>Correct answer was <span th:text="${correctAnswer}"></span></h2>
+
+<a href="/Home/WordsTrainer/start" class="button">continue</a>
+</body>
+</html>

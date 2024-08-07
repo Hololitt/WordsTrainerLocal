@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hello</title>
+</head>
+<body>
+<a href="/Home/create">creation</a>
+<a href="/Home/languageCards">Language cards</a>
+
+<table>
+    <tr th:each="languageCard : ${learnedLanguageCards}">
+        <td th:text="${languageCard.getWord()}">name</td>
+        <td th:text="${languageCard.getTranslation()}">password</td>
+        <td th:text="${languageCard.getMistakesCount}">email</td>
+        <td th:text="${languageCard.getTranslation()}">id</td>
+    </tr>
+</table>
+</body>
+</html>

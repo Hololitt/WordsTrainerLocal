@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
+</head>
+<body>
+<form th:action="@{/Home/WordsTrainer/submitSettings}" th:method="post" th:object="${wordsTrainerSettings}">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <label for="correctAnswersCountToFinish">Count of correct answers which will require to learn a language card </label>
+    <input type="text" id="correctAnswersCountToFinish" th:field="*{correctAnswersCountToFinish}"
+           autocomplete="off" placeholder="default count is 3" size="11">
+    <br><br>
+    <label>Training type:</label>
+    <input type="radio" id="mix" value="mix" th:field="*{translationRequestVariety}"/> Mix
+    <input type="radio" id="word to translation" value="word to translation" th:field="*{translationRequestVariety}"/> Word to Translation
+    <input type="radio" id="translation to word" value="translation to word" th:field="*{translationRequestVariety}"/> Translation to Word
+    <br><br>
+    <label for="countLanguageCardsToRepeat">Count of language cards, which will be included in training during repetition </label>
+    <input type="text" id="countLanguageCardsToRepeat" th:field="*{countLanguageCardsToRepeat}"
+           autocomplete="off" placeholder="default count is 5" size="11">
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<span th:text="${successfulSetting}"></span> <br><br>
+
+<a href="/Home/WordsTrainer" class="button-custom">Back to Words Trainer</a>
+</body>
+</html>

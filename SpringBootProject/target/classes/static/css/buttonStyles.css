@@ -1,0 +1,54 @@
+.button-custom {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 2px;
+}
+.button-successful {
+background-color: #a3ea03;
+  color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 2px;
+    display: inline-block;
+        padding: 10px 20px;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.button-profile {
+display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+}
+
+.button-default {
+display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+}
+.button-profile:hover {
+    background-color: #0056b3; /* Цвет фона при наведении */
+}
+.button-custom:hover {
+    background-color: #0056b3;
+}
+.button-successful:hover {
+  background-color: #79ad03;
+}
