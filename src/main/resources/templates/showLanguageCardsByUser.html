@@ -15,12 +15,14 @@
         <th>Translation</th>
         <th>Repeat Count</th>
         <th>Mistakes Count</th>
+        <th>Edit</th>
     </tr>
     <tr th:each="languageCard : ${languageCardsByUser}">
         <td><span th:text="${languageCard.getWord()}"></span></td>
         <td><span th:text="${languageCard.getTranslation()}"></span></td>
         <td><span th:text="${languageCard.getRepeatCount()}"></span></td>
         <td><span th:text="${languageCard.getMistakesCount()}"></span></td>
+        <td><a th:href="@{'/Home/WordsTrainer/editLanguageCard/' + ${languageCard.getId()}}">edit</a></td>
     </tr>
 </table>
 </body>

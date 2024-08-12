@@ -19,8 +19,17 @@
 
 <span th:text="${successfulCreation}"></span>  <br><br>
 
-<a href="/Home/WordsTrainer/preStart" class="button-custom">click to start the trainer</a> <br><br>
+<a href="/Home/WordsTrainer/prepareLanguageCards" class="button-custom">click to start the trainer</a> <br><br>
 
 <a href="/Home/WordsTrainer" class="button-custom">back to Words Trainer</a>
+
+<br><br>
+<h3>Created Language Cards</h3>
+<table>
+    <tr th:each="languageCard : ${createdLanguageCards}">
+        <td>Word: <span th:text="${languageCard.getWord()}"></span></td>
+       <td>Translation: <span th:text="${languageCard.getTranslation()}"></span></td>
+    </tr>
+</table>
 </body>
 </html>

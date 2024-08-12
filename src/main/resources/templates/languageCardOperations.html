@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Language Card Operations</title>
+    <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
+</head>
+<body>
+<h2>Search Language Card</h2>
+<form id="searchForm" th:action="@{/Home/WordsTrainer/search}" method="post" onsubmit="constructURL()">
+    <label for="type">Search by:</label>
+    <select name="type" id="type">
+        <option value="find by word">Word</option>
+        <option value="find by translation">Translation</option>
+    </select>
+    <br><br>
+    <label for="word">Enter search term:</label>
+    <input type="text" id="word" name="word">
+    <br>
+    <button type="submit">Search</button>
+</form>
+
+<div th:if="${foundedLanguageCard}">
+    <h2>Language Card Found:</h2>
+    <p>Word: <span th:text="${foundedLanguageCard.getWord}"></span></p>
+    <p>Translation: <span th:text="${foundedLanguageCard.getTranslation}"></span></p>
+</div>
+<div th:if="${nothingFounded}">
+    <p th:text="${nothingFounded}"></p>
+</div>
+<br><br>
+<a href="/Home/WordsTrainer" class="button-custom">Words Trainer</a>
+<script>
+        function constructURL() {
+            var type = document.getElementById("type").value;
+            var word = document.getElementById("word").value;
+            var url = "/Home/WordsTrainer/search/" + type + "/" + word;
+            document.getElementById("searchForm").action = url;
+        }
+    </script>
+</body>
+</html>

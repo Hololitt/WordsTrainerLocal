@@ -17,6 +17,10 @@
     <input type="radio" id="word to translation" value="word to translation" th:field="*{translationRequestVariety}"/> Word to Translation
     <input type="radio" id="translation to word" value="translation to word" th:field="*{translationRequestVariety}"/> Translation to Word
     <br><br>
+    <label for="countLanguageCardsToRepeat">Count of language cards, which will be included in training during repetition </label>
+    <input type="text" id="countLanguageCardsToRepeat" th:field="*{countLanguageCardsToRepeat}"
+           autocomplete="off" placeholder="default count is 5" size="11">
+    <br><br>
     <input type="submit" value="Submit">
 </form>
 

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Translation input form</title>
+  <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
 </head>
 <body>
 <form th:action="@{/Home/WordsTrainer/checkAnswer}" th:method="post" th:object="${answer}">
@@ -25,6 +26,8 @@
 <p id="correctAnswerMessage" class="hidden" th:text="${correctAnswerMessage}"></p>
 <p id="correctAnswer" class="hidden" th:text="${correctAnswer}"></p>
 <p id="incorrectAnswerMessage" class="hidden" th:text="${incorrectAnswerMessage}"></p>
+<br><br>
+<a href="/Home/WordsTrainer/cancelTraining" class="button-custom">cancel training</a>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var correctAnswerMessage = document.getElementById('correctAnswerMessage');

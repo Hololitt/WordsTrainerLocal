@@ -69,14 +69,17 @@ public CheckAnswerDTO checkAnswer(TranslationModel translationModel){
 }
 public List<LanguageCard> getMostDifficultLanguageCardsToLearn(){
     List<LanguageCard> languageCards = languageCardCacheService.getLanguageCardsByUser();
+    int countLanguageCardsToRepeat = getWordsTrainerSettingsForUser().getCountLanguageCardsToRepeat();
     languageCards.sort(Comparator.comparingInt(LanguageCard::getMistakesCount).reversed());
-    languageCards = languageCards.stream().limit(5).collect(Collectors.toList());
+    languageCards = languageCards.stream().limit(countLanguageCardsToRepeat).collect(Collectors.toList());
     return languageCards;
 }
 public List<LanguageCard> getRecommendedLanguageCardsToLearn(){
     List<LanguageCard> languageCards = languageCardCacheService.getLanguageCardsByUser();
+    int countLanguageCardsToRepeat = getWordsTrainerSettingsForUser().getCountLanguageCardsToRepeat();
     languageCards = languageCards.stream()
-            .sorted(Comparator.comparingInt(LanguageCard::getRepeatCount)).limit(5).collect(Collectors.toList());
+            .sorted(Comparator.comparingInt(LanguageCard::getRepeatCount)).limit(countLanguageCardsToRepeat)
+            .collect(Collectors.toList());
     return languageCards;
 }
     public int calculateCorrectAnswersCount(LanguageCard randomLanguageCard) {
