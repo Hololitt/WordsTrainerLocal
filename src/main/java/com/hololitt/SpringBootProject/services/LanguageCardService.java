@@ -30,15 +30,18 @@ languageCardRepository.save(languageCard);
     public void deleteLanguageCardByWordAndUserId(String word, int userId){
 languageCardRepository.deleteByUserIdAndWord(userId, word);
     }
+
 public LanguageCard findLanguageCardByWordAndUserId(String word, int userId){
        return languageCardRepository.findByWordAndUserId(word, userId);
 }
+
 public LanguageCard findLanguageCardByTranslationAndUserId(String translation, int userId){
         return languageCardRepository.findByTranslationAndUserId(translation, userId);
 }
 public void updateLanguageCard(LanguageCard newLanguageCard){
         languageCardRepository.save(newLanguageCard);
 }
+
 public LanguageCard findLanguageCardByIdAndUserId(int id, long userId){
         return languageCardRepository.findByIdAndUserId(id, userId);
 }

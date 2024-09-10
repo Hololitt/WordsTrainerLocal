@@ -2,9 +2,12 @@ package com.hololitt.SpringBootProject.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-
+import lombok.Setter;
+import lombok.Getter;
 @Entity
 @Table(name = "users")
+@Setter
+@Getter
 public class User {
     public User(){}
     public User(String name, String password, String email, long id){
@@ -30,30 +33,4 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public long getId(){
-        return id;
-    }
-public void setPassword(String password){
-        this.password = password;
-}
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

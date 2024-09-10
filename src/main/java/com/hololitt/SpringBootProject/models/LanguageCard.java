@@ -2,8 +2,13 @@ package com.hololitt.SpringBootProject.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "LanguageCards")
+@Setter
+@Getter
 public class LanguageCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,41 +50,11 @@ private int userId;
         this.translation = translation;
         this.userId = (int) userId;
     }
-
-    public void setUserId(long userId){
-        this.userId = (int) userId;
-    }
-    public int getUserId(){
-        return userId;
-    }
-    public int getId(){
-        return id;
-    }
-    public String getWord() {
-        return word;
-    }
-    public int getMistakesCount(){
-        return mistakesCount;
-    }
-    public void incrementMistakesCount(){
-        mistakesCount += 1;
-    }
-    public int getRepeatCount(){
-        return repeatCount;
-    }
     public void incrementRepeatCount(){
         repeatCount += 1;
     }
-    public String getTranslation() {
-        return translation;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public void setTranslation(String translation) {
-        this.translation = translation;
+    public void incrementMistakesCount(){
+        mistakesCount += 1;
     }
 
 }

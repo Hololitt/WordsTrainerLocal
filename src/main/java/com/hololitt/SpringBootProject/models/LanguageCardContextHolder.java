@@ -1,10 +1,16 @@
 package com.hololitt.SpringBootProject.models;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-
+import org.springframework.context.annotation.Scope;
 import java.util.*;
 
 @Component
+@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Setter
+@Getter
 public class LanguageCardContextHolder {
     private List<LanguageCard> languageCardsToLearn = new ArrayList<>();
     private final List<LanguageCard> learnedLanguageCards = new ArrayList<>();
@@ -13,9 +19,6 @@ public class LanguageCardContextHolder {
 private String randomValue;
 private LanguageCard randomLanguageCard;
 private final Random random = new Random();
-public Map<LanguageCard, Integer> getAllMistakesDuringTraining(){
-    return mistakesCountDuringTraining;
-}
 public void setContext(){
     initializeCorrectAnswersList();
     initializeMistakesCountDuringTrainingList();
@@ -39,15 +42,6 @@ public void generateRandomLanguageCardAndWord(){
     randomLanguageCard = languageCardsToLearn.get(random.nextInt(languageCardsToLearn.size()));
     randomValue = randomLanguageCard.getWord();
 }
-public List<Integer> getCorrectAnswers(){
-    return correctAnswers;
-}
-    public LanguageCard getRandomLanguageCard(){
-      return randomLanguageCard;
-    }
-    public String getRandomValue() {
-        return randomValue;
-    }
     public String getCorrectAnswer(String value, LanguageCard languageCard){
         String trueAnswer;
         String valueType = value.equals(languageCard.getWord()) ? "word" : "translation";
@@ -102,10 +96,9 @@ public void decrementCorrectAnswersCount(LanguageCard languageCard){
     }catch(UnsupportedOperationException e){
         e.printStackTrace();
     }
-
     }
     public void cleanUpContext(){
-    clearList(languageCardsToLearn);
+    //clearList(languageCardsToLearn);
     clearList(learnedLanguageCards);
     clearList(correctAnswers);
     clearMap(mistakesCountDuringTraining);
@@ -132,13 +125,7 @@ public void removeFromLanguageCardsToLearn(LanguageCard languageCard){
     public void addLearnedLanguageCard(LanguageCard languageCard){
         learnedLanguageCards.add(languageCard);
     }
-    public List<LanguageCard> getLearnedLanguageCards(){
-        return learnedLanguageCards;
-    }
-    public List<LanguageCard> getLanguageCardsToLearn(){
-        return languageCardsToLearn;
-    }
-    public void setLanguageCardsToLearn(List<LanguageCard> languageCardsToLearn){
-        this.languageCardsToLearn = languageCardsToLearn;
+    public Map<LanguageCard, Integer> getAllMistakesDuringTraining(){
+        return mistakesCountDuringTraining;
     }
 }

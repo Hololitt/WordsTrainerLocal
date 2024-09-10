@@ -1,6 +1,7 @@
 package com.hololitt.SpringBootProject.controllers;
 
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
+import com.hololitt.SpringBootProject.DTO.TrainingContextDTO;
 import com.hololitt.SpringBootProject.models.*;
 import com.hololitt.SpringBootProject.services.*;
 import com.hololitt.SpringBootProject.validators.LanguageCardValidator;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +49,7 @@ public class WordsTrainerController {
         languageCardContextHolder.cleanUpContext();
         languageCardCacheService.deleteCreatedLanguageCards();
         languageCardCacheService.deleteSelectedLanguageCardsToRepeat();
-        return "WordsTrainer";
+        return "redirect:/Home/WordsTrainer";
     }
     @PostMapping("/submitCreation")
     public String submitCreation(@ModelAttribute("languageCardCreationForm")
@@ -97,23 +99,22 @@ public class WordsTrainerController {
     @GetMapping("/start")
     public String start(Model model){
         wordsTrainerService.setTrainingType();
-
         LanguageCard randomLanguageCard = languageCardContextHolder.getRandomLanguageCard();
-        String randomValue = languageCardContextHolder.getRandomValue();
 
-        int correctAnswersCount = wordsTrainerService.calculateCorrectAnswersCount(randomLanguageCard);
-        int languageCardsToLearnAmount = languageCardContextHolder.getLanguageCardsToLearn().size();
-        int learnedLanguageCardsAmount = languageCardContextHolder.getLearnedLanguageCards().size();
-        int countCorrectAnswersToFinish = wordsTrainerSettingsService.getSettingsForUser(userService.getUserId())
-                .getCorrectAnswersCountToFinish();
-
-        model.addAttribute("correctAnswersCountToFinish", countCorrectAnswersToFinish);
+        TrainingContextDTO trainingDTO = createTrainingDTO(randomLanguageCard);
+        model.addAttribute("trainingData", trainingDTO);
         model.addAttribute("answer", new TranslationModel());
-        model.addAttribute("randomValue", randomValue);
-        model.addAttribute("languageCardsToLearnAmount", languageCardsToLearnAmount);
-        model.addAttribute("learnedLanguageCardsAmount", learnedLanguageCardsAmount);
-        model.addAttribute("correctAnswersCount", correctAnswersCount);
         return "checkTranslation";
+    }
+    private TrainingContextDTO createTrainingDTO(LanguageCard card) {
+        TrainingContextDTO dto = new TrainingContextDTO();
+        dto.setRandomValue(languageCardContextHolder.getRandomValue());
+        dto.setCorrectAnswersCount(wordsTrainerService.calculateCorrectAnswersCount(card));
+        dto.setLanguageCardsToLearnAmount(languageCardContextHolder.getLanguageCardsToLearn().size());
+        dto.setLearnedLanguageCardsAmount(languageCardContextHolder.getLearnedLanguageCards().size());
+        dto.setCorrectAnswersCountToFinish(wordsTrainerSettingsService.getSettingsForUser(userService.getUserId())
+                .getCorrectAnswersCountToFinish());
+        return dto;
     }
     @PostMapping("/checkAnswer")
     public String checkAnswer(@ModelAttribute("answer") TranslationModel translationModel, Model model){
@@ -138,15 +139,16 @@ public class WordsTrainerController {
         model.addAttribute("learnedLanguageCards", languageCardList);
         model.addAttribute("mistakesDuringTraining", mistakesDuringTraining);
 
+        languageCardCacheService.addLastLearnedLanguageCards(languageCardList, userService.getUserId());
         languageCardService.saveLanguageCardList(languageCardList);
         languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
-        languageCardCacheService.setLastLearnedLanguageCards(languageCardList);
         languageCardCacheService.deleteCreatedLanguageCards();
         return "finish";
     }
     @GetMapping("/repeat")
     public String repeatLanguageCards(){
-        List<LanguageCard> languageCards = languageCardCacheService.getLanguageCardsByUser();
+       // List<LanguageCard> languageCards = languageCardCacheService.getLanguageCardsByUser();
+        List<LanguageCard> languageCards = languageCardService.getLanguageCardsByUserId(userService.getUserId());
   return repeatLanguageCardsOrReturnException(languageCards);
     }
     @GetMapping("/repeatMostDifficult")
@@ -215,7 +217,7 @@ return "wordsTrainerSettings";
         LanguageCard editedLanguageCard = languageCardCacheService.getLanguageCardToEdit();
        editedLanguageCard.setWord(languageCardEditForm.getWord());
        editedLanguageCard.setTranslation(languageCardEditForm.getTranslation());
-       editedLanguageCard.setUserId(userService.getUserId());
+       editedLanguageCard.setUserId((int) userService.getUserId());
        languageCardService.updateLanguageCard(editedLanguageCard);
      languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
        return "redirect:/Home/WordsTrainer/languageCards";
@@ -234,9 +236,9 @@ return "wordsTrainerSettings";
  }
         private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
             if (languageCardValidator.isLanguageCardListValid(languageCards)) {
-                languageCardContextHolder.cleanUpContext();
-               languageCardContextHolder.setLanguageCardsToLearn(languageCards);
-               languageCardContextHolder.setContext();
+                  languageCardContextHolder.cleanUpContext();
+                languageCardContextHolder.setLanguageCardsToLearn(languageCards);
+                languageCardContextHolder.setContext();
                 return "redirect:/Home/WordsTrainer/preStart";
             }
             return "emptyListException";

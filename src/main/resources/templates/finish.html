@@ -11,15 +11,31 @@
 <a href="/Home/WordsTrainer" class="button-successful">Words Trainer</a>
 <br/>
 <h2>Learned language cards during training</h2>
+<h3 id="allMistakesCount">Count of mistakes during training: </h3>
 <table>
     <tr th:each="languageCard : ${learnedLanguageCards}">
-    <td>Word:  <span th:text="${languageCard.getWord()}"></span></td>
-    <td>Translation:  <span th:text="${languageCard.getTranslation()}"></span></td>
-    <td>RepeatCount:  <span th:text="${languageCard.getRepeatCount()}"></span></td>
-    <td>MistakesCount:  <span th:text="${languageCard.getMistakesCount()}"></span></td>
-        <td>Mistakes count during training: <span th:text="${mistakesDuringTraining.get(languageCard)}"></span></td>
+        <td>Word: <span th:text="${languageCard.getWord()}"></span></td>
+        <td>Translation: <span th:text="${languageCard.getTranslation()}"></span></td>
+        <td>RepeatCount: <span th:text="${languageCard.getRepeatCount()}"></span></td>
+        <td>MistakesCount: <span th:text="${languageCard.getMistakesCount()}"></span></td>
+        <td>Mistakes count during training: <span class="mistakesCount" th:text="${mistakesDuringTraining.get(languageCard)}"></span></td>
     </tr>
 </table>
+<script>
+  const allMistakesCount = document.querySelectorAll('.mistakesCount');
+let totalMistakesCount = 0;
 
+allMistakesCount.forEach(element => {
+    totalMistakesCount += parseInt(element.innerText);
+});
+
+let elementAllMistakesCount = document.getElementById('allMistakesCount');
+
+if (totalMistakesCount === 0) {
+    elementAllMistakesCount.innerText = 'You did zero mistakes during training!';
+} else {
+    elementAllMistakesCount.innerText = `Total mistakes during training: ${totalMistakesCount}`;
+}
+</script>
 </body>
 </html>

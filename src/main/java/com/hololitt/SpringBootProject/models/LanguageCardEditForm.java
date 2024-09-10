@@ -1,5 +1,10 @@
 package com.hololitt.SpringBootProject.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class LanguageCardEditForm {
     public LanguageCardEditForm(int id, String word, String translation) {
         this.id = id;
@@ -12,27 +17,4 @@ public class LanguageCardEditForm {
     private String word;
     private String translation;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getTranslation() {
-        return translation;
-    }
-
-    public void setTranslation(String translation) {
-        this.translation = translation;
-    }
 }

@@ -1,13 +1,11 @@
 package com.hololitt.SpringBootProject.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class TranslationModel {
     private String answer;
 
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
 }
