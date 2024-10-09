@@ -2,20 +2,15 @@ package com.hololitt.SpringBootProject.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Setter;
-import lombok.Getter;
+import lombok.*;
+
 @Entity
 @Table(name = "users")
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
-    public User(){}
-    public User(String name, String password, String email, long id){
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.id = id;
-    }
     public User(String name, String password, String email){
         this.name = name;
         this.email = email;

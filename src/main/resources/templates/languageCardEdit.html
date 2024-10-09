@@ -16,6 +16,12 @@
   <input type="text" id="translation" name="translation" th:value="${languageCardEditForm.getTranslation()}" required><br>
 
   <input type="submit" value="Edit">
+<br><br>
+</form>
+<form th:action ="@{/Home/WordsTrainer/delete/{id}(id=${languageCardEditForm.id})}" method="get"
+      onsubmit="return confirm('Are you sure you want to delete this card?');">
+  <input type="hidden" name="id" th:value="${languageCardEditForm.id}"/>
+  <input type="submit" value="Delete" class="button-custom">
 </form>
 <br><br>
 <a href="/Home/WordsTrainer" class="button-custom">Words Trainer</a>

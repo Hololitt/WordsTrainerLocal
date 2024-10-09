@@ -31,26 +31,37 @@ public void setContext(){
     }
 public void generateRandomValueAndLanguageCard(){
     boolean chooseWord = random.nextBoolean();
-    randomLanguageCard = languageCardsToLearn.get(random.nextInt(languageCardsToLearn.size()));
+    randomLanguageCard = selectRandomLanguageCard();
     randomValue = chooseWord ? randomLanguageCard.getWord() : randomLanguageCard.getTranslation();
 }
 public void generateRandomLanguageCardAndTranslation(){
-    randomLanguageCard = languageCardsToLearn.get(random.nextInt(languageCardsToLearn.size()));
+    randomLanguageCard = selectRandomLanguageCard();
     randomValue = randomLanguageCard.getTranslation();
 }
 public void generateRandomLanguageCardAndWord(){
-    randomLanguageCard = languageCardsToLearn.get(random.nextInt(languageCardsToLearn.size()));
+    randomLanguageCard = selectRandomLanguageCard();
     randomValue = randomLanguageCard.getWord();
 }
-    public String getCorrectAnswer(String value, LanguageCard languageCard){
-        String trueAnswer;
+public LanguageCard selectRandomLanguageCard(){
+    return languageCardsToLearn.get(random.nextInt(languageCardsToLearn.size()));
+}
+    public String generateRandomWrongFlashAnswer(String answerType) {
+        return switch (answerType) {
+            case "word" -> selectRandomLanguageCard().getTranslation();
+            case "translation" -> selectRandomLanguageCard().getWord();
+            default -> throw new IllegalArgumentException("Invalid wrongAnswerType: " + answerType);
+        };
+    }
+    public String defineCorrectAnswer(String value, LanguageCard languageCard){
+        String correctAnswer;
         String valueType = value.equals(languageCard.getWord()) ? "word" : "translation";
+
         if (valueType.equals("word")) {
-            trueAnswer = languageCard.getTranslation();
+            correctAnswer = languageCard.getTranslation();
         } else {
-            trueAnswer = languageCard.getWord();
+            correctAnswer = languageCard.getWord();
         }
-        return trueAnswer;
+        return correctAnswer;
     }
     private void initializeMistakesCountDuringTrainingList(){
        if(mistakesCountDuringTraining.isEmpty()){
@@ -98,7 +109,6 @@ public void decrementCorrectAnswersCount(LanguageCard languageCard){
     }
     }
     public void cleanUpContext(){
-    //clearList(languageCardsToLearn);
     clearList(learnedLanguageCards);
     clearList(correctAnswers);
     clearMap(mistakesCountDuringTraining);
@@ -119,9 +129,6 @@ public void removeFromLanguageCardsToLearn(LanguageCard languageCard){
         languageCardsToLearn.remove(languageCard);
 }
 
-    public void addLanguageCardToLearn(LanguageCard languageCard){
-        languageCardsToLearn.add(languageCard);
-    }
     public void addLearnedLanguageCard(LanguageCard languageCard){
         learnedLanguageCards.add(languageCard);
     }

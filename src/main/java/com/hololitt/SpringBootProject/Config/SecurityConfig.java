@@ -3,10 +3,10 @@ package com.hololitt.SpringBootProject.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,6 +15,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableAspectJAutoProxy
 public class SecurityConfig{
 
     private final UserDetailsService userDetailsService;
@@ -43,7 +44,13 @@ public class SecurityConfig{
                                 .defaultSuccessUrl("/Home/showProfile")
                                 .permitAll()
                 )
-                .logout(LogoutConfigurer::permitAll)
+                .logout(logout ->
+                        logout
+                                .logoutUrl("/Home/logout")
+                                .logoutSuccessUrl("/Home/login?logout")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                )
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 );

@@ -5,8 +5,6 @@ import com.hololitt.SpringBootProject.models.User;
 import com.hololitt.SpringBootProject.services.LanguageCardService;
 import com.hololitt.SpringBootProject.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,27 +25,6 @@ public HomePageController(UserService userService, LanguageCardService languageC
     public String add(@ModelAttribute("user") User user){
 userService.addUser(user);
 return "create";
-}
-@GetMapping("/create")
-    public String create(Model model){
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if(!authentication.isAuthenticated()){
-        return "redirect:/Home/login";
-    }
-        User user = new User();
-    model.addAttribute("user", user);
-    return "create";
-}
-@GetMapping("/delete")
-public String delete(Model model){
-        User userForDeletion = new User();
-        model.addAttribute("userForDeletion", userForDeletion);
-        return "delete";
-}
-@PostMapping("/submitDeletion")
-public String submitDeletion(@ModelAttribute("userForDeletion") User userForDeletion){
-        userService.deleteUser(userForDeletion);
-        return "delete";
 }
 @GetMapping("/users")
     public String show(Model model){

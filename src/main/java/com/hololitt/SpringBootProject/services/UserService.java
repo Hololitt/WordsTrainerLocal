@@ -3,6 +3,7 @@ package com.hololitt.SpringBootProject.services;
 import com.hololitt.SpringBootProject.Config.CustomUserDetails;
 import com.hololitt.SpringBootProject.models.User;
 import com.hololitt.SpringBootProject.repositorys.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -31,7 +32,7 @@ public class UserService {
             return (CustomUserDetails) authentication.getPrincipal();
         }
 
-        return null;
+        throw new EntityNotFoundException("User not found");
     }
     public long getUserId(){
         return getCurrentUser().getId();
@@ -42,19 +43,10 @@ user.setPassword(encodedPassword);
         userRepository.save(user);
     }
 
-    public void deleteUser(User user){
-        userRepository.delete(user);
-    }
     public User findUserByUsername(String username){
         return userRepository.findByName(username);
     }
     public boolean isUserExist(String username){
        return userRepository.existsByName(username);
-    }
-    public void updatePasswordForUser(String username, String newPassword) {
-        User user = userRepository.findByName(username);
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            user.setPassword(encodedPassword);
-        userRepository.save(user);
     }
 }

@@ -2,6 +2,7 @@ package com.hololitt.SpringBootProject.services;
 
 import com.hololitt.SpringBootProject.models.LanguageCard;
 import com.hololitt.SpringBootProject.repositorys.LanguageCardRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,12 +11,11 @@ import java.util.List;
 @Service
 public class LanguageCardService {
     private final LanguageCardRepository languageCardRepository;
-
-    public LanguageCardService(LanguageCardRepository languageCardRepository){
+  private final UserService userService;
+@Autowired
+    public LanguageCardService(LanguageCardRepository languageCardRepository, UserService userService){
         this.languageCardRepository = languageCardRepository;
-    }
-    public void saveLanguageCard(LanguageCard languageCard){
-languageCardRepository.save(languageCard);
+        this.userService = userService;
     }
     public List<LanguageCard> getLanguageCardList(){
         return languageCardRepository.findAll();
@@ -27,9 +27,9 @@ languageCardRepository.save(languageCard);
         languageCardRepository.saveAll(languageCardList);
     }
     @Transactional
-    public void deleteLanguageCardByWordAndUserId(String word, int userId){
-languageCardRepository.deleteByUserIdAndWord(userId, word);
-    }
+  public void deleteLanguageCardById(int id, long userId){
+        languageCardRepository.deleteByIdAndUserId(id, userId);
+  }
 
 public LanguageCard findLanguageCardByWordAndUserId(String word, int userId){
        return languageCardRepository.findByWordAndUserId(word, userId);
@@ -48,4 +48,22 @@ public LanguageCard findLanguageCardByIdAndUserId(int id, long userId){
 public long getCountLanguageCards(long userId){
         return languageCardRepository.countByUserId(userId);
 }
+public boolean isLanguageCardExists(String word, String translation){
+        return languageCardRepository.existsByWordAndTranslation(word, translation);
+}
+public boolean isLanguageCardExists(int languageCardId, long userId){
+    return languageCardRepository.existsByIdAndUserId(languageCardId, userId);
+}
+    public LanguageCard searchLanguageCard(String searchingType, String value){
+        LanguageCard foundedLanguageCard = null;
+        switch(searchingType){
+            case "find by word" ->
+                    foundedLanguageCard = findLanguageCardByWordAndUserId(value,
+                            (int) userService.getUserId());
+            case "find by translation" ->
+                    foundedLanguageCard = findLanguageCardByTranslationAndUserId(value,
+                            (int) userService.getUserId());
+        }
+        return foundedLanguageCard;
+    }
 }

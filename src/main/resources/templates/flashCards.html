@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            display: block;
+            cursor: pointer;
+        }
+        .correct {
+            background-color: #c8e6c9; /* зеленый */
+        }
+        .incorrect {
+            background-color: #ffcdd2; /* красный */
+        }
+    </style>
+</head>
+<body>
+
+<h1 id="question">Вопрос</h1>
+<div id="answers"></div>
+
+<script>
+    let flashCards = [];
+    let currentCardIndex = 0;
+    let repeatCount = 0; // Количество повторений
+    let currentRepeat = 0; // Текущий счетчик повторений
+
+    function loadFlashCards() {
+        fetch('/Home/WordsTrainer/repeat/flashcards')
+            .then(response => response.json())
+            .then(data => {
+                flashCards = data; // Сохраняем массив карточек
+                repeatCount = data.repeatCount; // Получаем количество повторений
+                if (flashCards.length > 0) {
+                    displayFlashCard();
+                } else {
+                    window.location.href = '/Home/WordsTrainer/preStart'; // Перенаправление, если список пуст
+                }
+            });
+    }
+
+    function displayFlashCard() {
+        const currentCard = flashCards[currentCardIndex];
+        document.getElementById('question').innerText = currentCard.question;
+        displayAnswers(currentCard.wrongFlashAnswers, currentCard.correctAnswer);
+    }
+
+    function displayAnswers(wrongAnswers, correctAnswer) {
+        const answersContainer = document.getElementById('answers');
+        answersContainer.innerHTML = '';
+
+        const allAnswers = [...wrongAnswers, correctAnswer];
+        allAnswers.sort(() => Math.random() - 0.5); // Перемешиваем ответы
+
+        allAnswers.forEach(answer => {
+            const div = document.createElement('div');
+            div.classList.add('card');
+            div.innerText = answer;
+            div.onclick = () => checkAnswer(answer, div, correctAnswer);
+            answersContainer.appendChild(div);
+        });
+    }
+
+    function checkAnswer(selectedAnswer, selectedCard, correctAnswer) {
+        if (selectedAnswer === correctAnswer) {
+            selectedCard.classList.add('correct'); // Подсвечиваем зеленым
+            setTimeout(() => {
+                currentCardIndex++; // Переходим к следующей карточке
+
+                // Проверяем, достигли ли конца карточек
+                if (currentCardIndex < flashCards.length) {
+                    displayFlashCard(); // Загружаем следующий вопрос
+                } else if (currentRepeat < repeatCount) {
+                    // Если есть повторения, сбрасываем индекс и увеличиваем счетчик повторений
+                    currentCardIndex = 0;
+                    currentRepeat++;
+                    displayFlashCard(); // Загружаем вопросы снова
+                } else {
+                    window.location.href = '/Home/WordsTrainer/preStart'; // Перенаправляем, если список пуст
+                }
+            }, 600);
+        } else {
+            selectedCard.classList.add('incorrect'); // Подсвечиваем красным
+        }
+    }
+
+    // Загружаем первый вопрос
+    loadFlashCards();
+</script>
+
+</body>
+</html>

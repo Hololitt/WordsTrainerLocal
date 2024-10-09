@@ -1,16 +1,13 @@
 package com.hololitt.SpringBootProject.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@AllArgsConstructor
 public class RegistrationForm {
-    public RegistrationForm(String name, String password, String email) {
-        this.name = name;
-        this.password = password;
-        this.email = email;
-    }
 public RegistrationForm(){}
     private String name;
     private String password;

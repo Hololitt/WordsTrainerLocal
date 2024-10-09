@@ -1,34 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.hololitt</groupId>
 	<artifactId>SpringBootProject</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SpringBootProject</name>
 	<description>Demo project for Spring Boot</description>
-	<url/>
+	<url>https://github.com/Hololitt/WordsTrainerApp</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>The MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
 	</licenses>
+
 	<developers>
-		<developer/>
+		<developer>
+			<id>Nikon</id>
+			<name>Nikon</name>
+			<email>hololitt@gmail.com</email>
+		</developer>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:https://github.com/Hololitt/WordsTrainerApp.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/Hololitt/WordsTrainerApp.git</developerConnection>
+		<url>https://github.com/Hololitt/WordsTrainerApp</url>
 	</scm>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+	<distributionManagement>
+		<repository>
+			<id>WordsTrainerApp</id>
+			<url>https://github.com/Hololitt/WordsTrainerApp</url>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -41,11 +54,14 @@
 		</dependency>
 
 
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>3.3.3</version>
 			<scope>test</scope>
 		</dependency>
+
 
 		<!-- Зависимости для работы с базой данных PostgreSQL -->
 		<dependency>
@@ -72,12 +88,6 @@
 			<version>6.2.0.Final</version>
 		</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json -->
 		<dependency>
@@ -86,6 +96,13 @@
 			<version>3.3.2</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.34</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
