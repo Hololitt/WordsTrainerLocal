@@ -18,10 +18,28 @@ public class LanguageCardContextHolder {
     private final Map<LanguageCard, Integer> mistakesCountDuringTraining = new HashMap<>();
 private String randomValue;
 private LanguageCard randomLanguageCard;
+private int mistakesCount;
 private final Random random = new Random();
 public void setContext(){
     initializeCorrectAnswersList();
     initializeMistakesCountDuringTrainingList();
+}
+    private void initializeMistakesCountDuringTrainingList(){
+        if(mistakesCountDuringTraining.isEmpty()){
+            for (LanguageCard languageCard : languageCardsToLearn) {
+                mistakesCountDuringTraining.put(languageCard, 0);
+            }
+        }
+    }
+    private void initializeCorrectAnswersList(){
+        if(correctAnswers.isEmpty()){
+            for(int i = 0; i<languageCardsToLearn.size(); i++){
+                correctAnswers.add(i, 0);
+            }
+        }
+    }
+public void incrementMistakesCount(){
+    mistakesCount += 1;
 }
     public void incrementMistakesCountDuringTraining(LanguageCard languageCard){
        int currentMistakesCount = mistakesCountDuringTraining.get(languageCard);
@@ -63,20 +81,7 @@ public LanguageCard selectRandomLanguageCard(){
         }
         return correctAnswer;
     }
-    private void initializeMistakesCountDuringTrainingList(){
-       if(mistakesCountDuringTraining.isEmpty()){
-           for (LanguageCard languageCard : languageCardsToLearn) {
-               mistakesCountDuringTraining.put(languageCard, 0);
-           }
-       }
-    }
-    private void initializeCorrectAnswersList(){
-        if(correctAnswers.isEmpty()){
-            for(int i = 0; i<languageCardsToLearn.size(); i++){
-                correctAnswers.add(i, 0);
-            }
-        }
-    }
+
     public boolean isCorrectAnswer(LanguageCard languageCard, String answer, String correctAnswer) {
             if (answer.equals(correctAnswer)) {
                 int index = languageCardsToLearn.indexOf(languageCard);

@@ -1,5 +1,6 @@
 package com.hololitt.SpringBootProject.services;
 
+import com.hololitt.SpringBootProject.models.FlashCard;
 import com.hololitt.SpringBootProject.models.FlashCardTrainingContext;
 import com.hololitt.SpringBootProject.models.LanguageCard;
 import com.hololitt.SpringBootProject.models.LanguageCardContextHolder;
@@ -12,14 +13,23 @@ import java.util.Set;
 
 @Service
 public class FlashCardService {
+    public List<FlashCard> createMatchingTrainingList(List<LanguageCard> languageCardsToLearn){
+        List<FlashCard> flashCards = new ArrayList<>();
+        for(LanguageCard languageCard : languageCardsToLearn){
+            String word = languageCard.getWord();
+            String translation = languageCard.getTranslation();
+            flashCards.add(new FlashCard(word, translation));
+        }
+        return flashCards;
+    }
     public List<FlashCardTrainingContext> createFlashCardTrainingList(List<LanguageCard> languageCardList){
         LanguageCardContextHolder languageCardContext = new LanguageCardContextHolder();
         List<FlashCardTrainingContext> flashCardTrainingContextList = new ArrayList<>();
         List<LanguageCard> usedCards = new ArrayList<>();
 int counter = 0;
         while(counter < languageCardList.size()){
-            FlashCardTrainingContext flashCardTrainingContext =
-                    createFlashCardTrainingContext(languageCardList, languageCardContext, usedCards);
+            FlashCardTrainingContext flashCardTrainingContext = createFlashCardTrainingContext(languageCardList,
+                    languageCardContext, usedCards);
             flashCardTrainingContextList.add(flashCardTrainingContext);
             counter++;
         }
@@ -56,13 +66,23 @@ usedCards.add(languageCard);
     private Set<String> generateWrongFlashAnswers(LanguageCardContextHolder languageCardContext,
                                                   String valueType, String correctAnswer){
         Set<String> wrongFlashAnswers = new HashSet<>();
-        while (wrongFlashAnswers.size() < 4) {
+        int languageCardsToLearnSize = languageCardContext.getLanguageCardsToLearn().size();
+        while (wrongFlashAnswers.size() < createWrongFlashAnswersCounter(languageCardsToLearnSize)) {
             String wrongAnswer = languageCardContext.generateRandomWrongFlashAnswer(valueType);
 
             if (!wrongAnswer.equals(correctAnswer)) {
                 wrongFlashAnswers.add(wrongAnswer);
             }
         }
+
         return wrongFlashAnswers;
+    }
+    private int createWrongFlashAnswersCounter(int languageCardListSize){
+        if(languageCardListSize == 5 || languageCardListSize > 5){
+return 4;
+        }else {
+            return languageCardListSize - 1;
+        }
+
     }
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards</title>
+    <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,19 +30,17 @@
 
 <h1 id="question">Вопрос</h1>
 <div id="answers"></div>
-
+<br><br>
+<a href="/Home/WordsTrainer" class="button-custom">Cancel Training</a>
 <script>
     let flashCards = [];
     let currentCardIndex = 0;
-    let repeatCount = 0; // Количество повторений
-    let currentRepeat = 0; // Текущий счетчик повторений
 
     function loadFlashCards() {
         fetch('/Home/WordsTrainer/repeat/flashcards')
             .then(response => response.json())
             .then(data => {
                 flashCards = data; // Сохраняем массив карточек
-                repeatCount = data.repeatCount; // Получаем количество повторений
                 if (flashCards.length > 0) {
                     displayFlashCard();
                 } else {
@@ -77,15 +76,8 @@
             selectedCard.classList.add('correct'); // Подсвечиваем зеленым
             setTimeout(() => {
                 currentCardIndex++; // Переходим к следующей карточке
-
-                // Проверяем, достигли ли конца карточек
                 if (currentCardIndex < flashCards.length) {
                     displayFlashCard(); // Загружаем следующий вопрос
-                } else if (currentRepeat < repeatCount) {
-                    // Если есть повторения, сбрасываем индекс и увеличиваем счетчик повторений
-                    currentCardIndex = 0;
-                    currentRepeat++;
-                    displayFlashCard(); // Загружаем вопросы снова
                 } else {
                     window.location.href = '/Home/WordsTrainer/preStart'; // Перенаправляем, если список пуст
                 }

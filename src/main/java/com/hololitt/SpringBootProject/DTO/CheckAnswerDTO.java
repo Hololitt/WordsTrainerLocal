@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CheckAnswerDTO {
     private boolean isCorrect;
+    private boolean repeatFlashCardsTraining;
     private String correctAnswer;
 
 }

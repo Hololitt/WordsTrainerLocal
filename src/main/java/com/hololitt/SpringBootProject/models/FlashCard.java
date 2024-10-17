@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class FlashCard {
-private String correctAnswer;
-private String wrongAnswer;
-
+private String word;
+private String translation;
 }

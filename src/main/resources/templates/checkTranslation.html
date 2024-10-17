@@ -4,8 +4,76 @@
   <meta charset="UTF-8">
   <title>Translation Input Form</title>
   <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column; /* Вертикальная ориентация */
+      justify-content: space-between; /* Пробел между элементами */
+      height: 100vh; /* Высота на весь экран */
+      margin: 0; /* Убираем отступы */
+      font-family: Arial, sans-serif; /* Устанавливаем шрифт */
+    }
+
+    .info {
+      border: 1px solid #ccc; /* Рамка */
+      padding: 10px; /* Отступы внутри рамки */
+      border-radius: 8px; /* Закругленные углы */
+      background-color: #f9f9f9; /* Цвет фона */
+      margin: 20px; /* Отступы вокруг рамки */
+      max-width: 400px; /* Максимальная ширина рамки */
+      align-self: center; /* Центрируем рамку по горизонтали */
+    }
+
+    form {
+      border: 1px solid #ccc; /* Рамка */
+      padding: 20px; /* Отступы внутри формы */
+      border-radius: 8px; /* Закругленные углы */
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень */
+      background-color: #f9f9f9; /* Цвет фона */
+      margin: 20px; /* Отступы вокруг формы */
+      max-width: 400px; /* Максимальная ширина формы */
+      align-self: center; /* Центрируем форму по горизонтали */
+    }
+
+    input[type="text"] {
+      width: 100%; /* Ширина поля ввода */
+      padding: 10px; /* Отступы внутри поля */
+      margin-top: 40px; /* Отступ сверху */
+      margin-bottom: 40px; /* Отступ снизу */
+      border: 1px solid #ccc; /* Рамка поля ввода */
+      border-radius: 4px; /* Закругленные углы */
+    }
+
+    .button-custom {
+      display: inline-block; /* Отображение в виде блока */
+      padding: 8px 12px; /* Уменьшенные отступы */
+      background-color: #007bff; /* Цвет фона кнопки */
+      color: white; /* Цвет текста */
+      text-decoration: none; /* Убираем подчеркивание */
+      border-radius: 4px; /* Закругленные углы */
+      margin: 80px auto; /* Центрирование и отступы */
+      width: 120px; /* Фиксированная ширина кнопки */
+      text-align: center; /* Центрируем текст внутри кнопки */
+    }
+
+    .hidden {
+      display: none; /* Скрываем элементы */
+    }
+  </style>
 </head>
 <body>
+
+<div class="info">
+  <p>Count of correct answers needed to learn this word:
+    <span th:text="${trainingData.correctAnswersCountToFinish - trainingData.correctAnswersCount}"></span>
+  </p>
+  <h4>You learned:
+    <span th:text="${trainingData.learnedLanguageCardsAmount}"></span>
+    to learn:
+    <span th:text="${trainingData.languageCardsToLearnAmount}"></span>
+  </h4>
+</div>
+
 <form th:action="@{/Home/WordsTrainer/checkAnswer}" th:method="post" th:object="${answer}">
   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
   <label for="answer">Write translation to: <span th:text="${trainingData.randomValue}"></span></label>
@@ -13,22 +81,15 @@
   <br>
   <input type="submit" value="Submit">
 </form>
+
+<a href="/Home/WordsTrainer/cancelTraining" class="button-custom">Cancel Training</a>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var inputField = document.getElementById('answer');
     inputField.focus();
   });
-</script>
-<p>Count of correct answers to learn this word: <span th:text="${trainingData.correctAnswersCount}"></span>/<span th:text="${trainingData.correctAnswersCountToFinish}"></span></p>
-<br/>
-<h4>You learned: <span th:text="${trainingData.learnedLanguageCardsAmount}"></span>  to learn: <span th:text="${trainingData.languageCardsToLearnAmount}"></span></h4>
 
-<p id="correctAnswerMessage" class="hidden" th:text="${correctAnswerMessage}"></p>
-<p id="correctAnswer" class="hidden" th:text="${correctAnswer}"></p>
-<p id="incorrectAnswerMessage" class="hidden" th:text="${incorrectAnswerMessage}"></p>
-<br><br>
-<a href="/Home/WordsTrainer/cancelTraining" class="button-custom">Cancel Training</a>
-<script>
   document.addEventListener('DOMContentLoaded', function() {
     var correctAnswerMessage = document.getElementById('correctAnswerMessage');
     var correctAnswer = document.getElementById('correctAnswer');
@@ -50,5 +111,6 @@
     }
   });
 </script>
+<br><br>
 </body>
 </html>
