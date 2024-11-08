@@ -30,10 +30,20 @@ public class WordsTrainerSettingsService {
         String translationRequestVariety = settings.getTranslationRequestVariety();
 String flashCardsTrainingVariety = settings.getFlashCardsTrainingVariety();
 
-        countCorrectAnswersToFinish = (countCorrectAnswersToFinish > 0) ? countCorrectAnswersToFinish : defaultCountCorrectAnswersToFinish;
-        countLanguageCardsToRepeat = (countLanguageCardsToRepeat > 0) ? countLanguageCardsToRepeat : defaultCountLanguageCardsToRepeat;
-        translationRequestVariety = allowedValues.contains(translationRequestVariety) ? translationRequestVariety : defaultTranslationRequestVariety;
-flashCardsTrainingVariety = FlashCardsTrainingVariety.chooseType(flashCardsTrainingVariety);
+        countCorrectAnswersToFinish = (countCorrectAnswersToFinish > 0) ? countCorrectAnswersToFinish
+                : defaultCountCorrectAnswersToFinish;
+
+        countLanguageCardsToRepeat = (countLanguageCardsToRepeat > 0) ? countLanguageCardsToRepeat
+                : defaultCountLanguageCardsToRepeat;
+
+        translationRequestVariety = allowedValues.contains(translationRequestVariety) ? translationRequestVariety
+                : defaultTranslationRequestVariety;
+
+try{
+    flashCardsTrainingVariety = FlashCardsTrainingVariety.chooseType(flashCardsTrainingVariety);
+}catch(IllegalArgumentException e){
+    flashCardsTrainingVariety = defaultFlashCardsTrainingVariety;
+}
 
         return new WordsTrainerSettings(countCorrectAnswersToFinish,
                 translationRequestVariety, countLanguageCardsToRepeat, settings.getUserId(), flashCardsTrainingVariety);
@@ -59,6 +69,6 @@ enum FlashCardsTrainingVariety{
                 return flashCardsTrainingVariety.type;
             }
         }
-        throw new IllegalArgumentException("Illegal FlashCardsTrainingVariety type");
+        throw new IllegalArgumentException("Illegal FlashCardsTrainingVariety type: " + type);
     }
 }

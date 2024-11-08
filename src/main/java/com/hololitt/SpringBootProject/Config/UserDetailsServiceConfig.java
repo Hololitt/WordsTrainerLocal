@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
 
 @Configuration
+@SuppressWarnings("unused")
 public class UserDetailsServiceConfig {
     private final UserService userService;
 

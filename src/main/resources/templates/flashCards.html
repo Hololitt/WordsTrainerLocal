@@ -35,21 +35,28 @@
 <script>
     let flashCards = [];
     let currentCardIndex = 0;
+    const batchSize = 5;
 
     function loadFlashCards() {
         fetch('/Home/WordsTrainer/repeat/flashcards')
             .then(response => response.json())
             .then(data => {
-                flashCards = data; // Сохраняем массив карточек
+                flashCards = data;
                 if (flashCards.length > 0) {
                     displayFlashCard();
                 } else {
-                    window.location.href = '/Home/WordsTrainer/preStart'; // Перенаправление, если список пуст
+                    window.location.href = '/Home/WordsTrainer/preStart';
                 }
             });
     }
 
     function displayFlashCard() {
+        if (currentCardIndex >= flashCards.length) {
+
+            window.location.href = '/Home/WordsTrainer/preStart';
+            return;
+        }
+
         const currentCard = flashCards[currentCardIndex];
         document.getElementById('question').innerText = currentCard.question;
         displayAnswers(currentCard.wrongFlashAnswers, currentCard.correctAnswer);
@@ -76,11 +83,7 @@
             selectedCard.classList.add('correct'); // Подсвечиваем зеленым
             setTimeout(() => {
                 currentCardIndex++; // Переходим к следующей карточке
-                if (currentCardIndex < flashCards.length) {
-                    displayFlashCard(); // Загружаем следующий вопрос
-                } else {
-                    window.location.href = '/Home/WordsTrainer/preStart'; // Перенаправляем, если список пуст
-                }
+                displayFlashCard(); // Загружаем следующий вопрос
             }, 600);
         } else {
             selectedCard.classList.add('incorrect'); // Подсвечиваем красным

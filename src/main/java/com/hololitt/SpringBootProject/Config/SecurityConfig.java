@@ -1,6 +1,7 @@
 package com.hololitt.SpringBootProject.Config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -12,10 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableAspectJAutoProxy
+@EnableCaching
+@SuppressWarnings("unused")
 public class SecurityConfig{
 
     private final UserDetailsService userDetailsService;

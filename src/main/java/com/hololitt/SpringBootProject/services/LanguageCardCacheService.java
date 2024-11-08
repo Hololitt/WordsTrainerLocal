@@ -28,25 +28,10 @@ public class LanguageCardCacheService {
         this.languageCardService = languageCardService;
         this.userService = userService;
     }
-    public LanguageCard getLanguageCardById(int languageCardId){
-        List<LanguageCard> languageCards = getLanguageCardsByUser();
-for(LanguageCard languageCard : languageCards){
-    if(languageCard.getId() == languageCardId){
-        return languageCard;
-    }
-}
-return null;
-    }
     public void deleteSelectedLanguageCardsToRepeat(){
         if(!selectedLanguageCardsToRepeat.isEmpty()){
             selectedLanguageCardsToRepeat.clear();
         }
-    }
-    public void addSelectedLanguageCard(LanguageCard languageCard){
-        selectedLanguageCardsToRepeat.add(languageCard);
-    }
-    public List<LanguageCard> getSelectedLanguageCardsToRepeat(){
-        return selectedLanguageCardsToRepeat;
     }
     public void deleteCreatedLanguageCards(){
         if(!createdLanguageCards.isEmpty()){
@@ -75,16 +60,4 @@ return null;
         List<LanguageCard> languageCards = languageCardService.getLanguageCardsByUserId(userId);
         cachedLanguageCardsByUser.put(userId, languageCards);
     }
-    public void addLastLearnedLanguageCards(List<LanguageCard> languageCards, long userId){
-        if(cachedLastLearnedLanguageCards.containsKey(userId)){
-            cachedLastLearnedLanguageCards.replace(userId, languageCards);
-        }else{
-            cachedLastLearnedLanguageCards.put(userId, languageCards);
-        }
-    }
-
-  public List<LanguageCard> getLastLearnedLanguageCards(){
-        long userId = userService.getUserId();
-       return cachedLastLearnedLanguageCards.get(userId);
-  }
 }

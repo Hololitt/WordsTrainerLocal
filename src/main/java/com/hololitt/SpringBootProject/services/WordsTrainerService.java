@@ -3,9 +3,10 @@ package com.hololitt.SpringBootProject.services;
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
 import com.hololitt.SpringBootProject.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -84,6 +85,7 @@ private TrainingType getTrainingType(){
 
         if (correctAnswersCount == correctAnswersCountToFinish) {
             randomLanguageCard.incrementRepeatCount();
+            randomLanguageCard.setLastRepetition(LocalDateTime.now(ZoneId.of("Europe/Berlin")));
             languageCardContextHolder.addLearnedLanguageCard(randomLanguageCard);
             languageCardContextHolder.removeFromCorrectAnswers(randomLanguageCard);
             languageCardContextHolder.removeFromLanguageCardsToLearn(randomLanguageCard);

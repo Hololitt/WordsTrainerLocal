@@ -51,9 +51,6 @@ public long getCountLanguageCards(long userId){
 public boolean isLanguageCardExists(String word, String translation){
         return languageCardRepository.existsByWordAndTranslation(word, translation);
 }
-public boolean isLanguageCardExists(int languageCardId, long userId){
-    return languageCardRepository.existsByIdAndUserId(languageCardId, userId);
-}
     public LanguageCard searchLanguageCard(String searchingType, String value){
         LanguageCard foundedLanguageCard = null;
         switch(searchingType){

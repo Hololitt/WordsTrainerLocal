@@ -2,13 +2,20 @@ package com.hololitt.SpringBootProject.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "LanguageCards")
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LanguageCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +34,19 @@ private int userId;
     private int mistakesCount;
     @Column(name = "repeatCount")
     private int repeatCount;
-    public LanguageCard() {}
+
+    @Column(name = "creation_date", updatable = false)
+    private LocalDateTime creationDate;
+
+    @Column(name = "last_repetition")
+    private LocalDateTime lastRepetition;
+
+    @PrePersist
+    protected void onCreation(){
+        creationDate = LocalDateTime.now(ZoneId.of("Europe/Berlin"));
+    }
+
+
     public LanguageCard(String word, String translation, long userId, int id){
         this.word = word;
         this.translation = translation;

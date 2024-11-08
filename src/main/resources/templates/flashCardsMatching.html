@@ -41,6 +41,9 @@
         .matched {
             display: none; /* Скрываем карточки, которые уже сопоставлены */
         }
+        .hidden {
+            display: none; /* Скрываем карточки временно */
+        }
     </style>
 </head>
 <body>
@@ -56,6 +59,8 @@
     let matchedCount = 0;
     let selectedWord = null;
     let selectedTranslation = null;
+    const batchSize = 5; // Количество карточек для отображения за раз
+    let currentBatchIndex = 0; // Индекс текущей партии
 
     function loadFlashCards() {
         fetch('/Home/WordsTrainer/repeat/flashcardsMatching')
@@ -71,12 +76,16 @@
         const wordsContainer = document.getElementById('words');
         const translationsContainer = document.getElementById('translations');
 
-        const words = flashCards.map(card => card.word);
-        const translations = flashCards.map(card => card.translation);
+        // Получаем слова и переводы для текущей партии
+        const currentBatch = flashCards.slice(currentBatchIndex * batchSize, (currentBatchIndex + 1) * batchSize);
+        const words = currentBatch.map(card => card.word);
+        const translations = currentBatch.map(card => card.translation);
 
         shuffleArray(words);
         shuffleArray(translations);
 
+        // Отображаем слова
+        wordsContainer.innerHTML = ''; // Очищаем контейнер
         words.forEach(word => {
             const div = document.createElement('div');
             div.classList.add('card');
@@ -85,6 +94,8 @@
             wordsContainer.appendChild(div);
         });
 
+        // Отображаем переводы
+        translationsContainer.innerHTML = ''; // Очищаем контейнер
         translations.forEach(translation => {
             const div = document.createElement('div');
             div.classList.add('card');
@@ -110,7 +121,7 @@
             const isCorrect = flashCards.some(card => card.word === selectedWord && card.translation === selectedTranslation);
             setTimeout(() => {
                 clearSelectedCards(isCorrect);
-            });
+            }, 200);
         }
     }
 
@@ -132,25 +143,34 @@
         });
 
         // Удаляем карточки после задержки
-     if (correctCards.length > 0) {
-    setTimeout(() => {
-        correctCards.forEach(card => {
-            if (card && card.innerText) { // Проверка на существование карточки
-                console.log(`Card removed: ${card.innerText}`); // Отладочное сообщение
-                card.classList.add('matched'); // Помечаем карточки как сопоставленные
-                card.remove(); // Удаляем только правильные карточки
-            }
-        });
-        console.log(`Matched Count after removal: ${matchedCount}`); // Отладочное сообщение
-        // Проверка на завершение игры
-        if (matchedCount / 2 === flashCards.length) {
-            console.log("All matched! Redirecting..."); // Отладочное сообщение
-            window.location.href = '/Home/WordsTrainer/start';
-        } else {
-            console.log("Not all matched yet."); // Отладочное сообщение
+        if (correctCards.length > 0) {
+            setTimeout(() => {
+                correctCards.forEach(card => {
+                    if (card && card.innerText) { // Проверка на существование карточки
+                        console.log(`Card removed: ${card.innerText}`); // Отладочное сообщение
+                        card.classList.add('matched'); // Помечаем карточки как сопоставленные
+                        card.remove(); // Удаляем только правильные карточки
+                    }
+                });
+                console.log(`Matched Count after removal: ${matchedCount}`); // Отладочное сообщение
+
+                // Проверка на завершение игры
+                if (matchedCount / 2 === flashCards.length) {
+                    console.log("All matched! Redirecting..."); // Отладочное сообщение
+                    window.location.href = '/Home/WordsTrainer/start';
+                } else {
+                    // Если еще остались карточки, загружаем следующую партию
+                    if (matchedCount % batchSize === 0) {
+                        currentBatchIndex++; // Переход к следующей партии
+                        if (currentBatchIndex * batchSize < flashCards.length) {
+                            displayFlashCards(); // Загружаем следующую партию
+                        } else {
+                            console.log("No more batches left."); // Отладочное сообщение
+                        }
+                    }
+                }
+            }, 600);
         }
-    });
-}
 
         // Сбрасываем выбранные значения
         selectedWord = null;

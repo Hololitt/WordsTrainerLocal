@@ -17,6 +17,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public UserService(UserRepository userRepository, @Lazy PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;

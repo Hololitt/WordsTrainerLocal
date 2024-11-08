@@ -1,5 +1,6 @@
 package com.hololitt.SpringBootProject.ExceptionHandlers;
 
+import com.hololitt.SpringBootProject.exceptions.LanguageCardNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,5 +14,8 @@ public class GlobalExceptionHandler {
         System.out.println(exception.getMessage());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+@ExceptionHandler(LanguageCardNotFoundException.class)
+    public ResponseEntity<String> handleLangaugeCardNotFoundException(LanguageCardNotFoundException exception){
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+}
 }

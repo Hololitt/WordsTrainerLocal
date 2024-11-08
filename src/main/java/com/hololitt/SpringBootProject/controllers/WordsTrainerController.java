@@ -7,8 +7,6 @@ import com.hololitt.SpringBootProject.services.*;
 import com.hololitt.SpringBootProject.validators.LanguageCardValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +25,7 @@ public class WordsTrainerController {
     private final WordsTrainerSettingsService wordsTrainerSettingsService;
     private final LanguageCardValidator languageCardValidator;
     private final FlashCardService flashCardService;
+    private final LastLearnedLanguageCardsService lastLearnedLanguageCardsService;
     @Autowired
     public WordsTrainerController(LanguageCardService languageCardService,
                                   UserService userService,
@@ -34,7 +33,8 @@ public class WordsTrainerController {
                                   WordsTrainerService wordsTrainerService,
                                   LanguageCardContextHolder languageCardContextHolder,
                                   WordsTrainerSettingsService wordsTrainerSettingsService,
-                                  LanguageCardValidator languageCardValidator, FlashCardService flashCardService
+                                  LanguageCardValidator languageCardValidator, FlashCardService flashCardService,
+                                  LastLearnedLanguageCardsService lastLearnedLanguageCardsService
                                   ){
         this.languageCardService = languageCardService;
         this.userService = userService;
@@ -44,6 +44,7 @@ public class WordsTrainerController {
         this.wordsTrainerSettingsService = wordsTrainerSettingsService;
         this.languageCardValidator = languageCardValidator;
         this.flashCardService = flashCardService;
+        this.lastLearnedLanguageCardsService = lastLearnedLanguageCardsService;
     }
     @GetMapping("/cancelTraining")
     public String cancelTraining(){
@@ -52,29 +53,7 @@ public class WordsTrainerController {
         languageCardCacheService.deleteSelectedLanguageCardsToRepeat();
         return "redirect:/Home/WordsTrainer";
     }
-    @PostMapping("/submitCreation")
-    public String submitCreation(@ModelAttribute("languageCardCreationForm")
-                                 LanguageCardCreationForm languageCardCreationForm, Model model){
-        String word = languageCardCreationForm.getWord();
-        String translation = languageCardCreationForm.getTranslation();
 
-        if(languageCardService.isLanguageCardExists(word, translation)){
-            model.addAttribute("languageCardExists", "This language card exists in base");
-            return "setLanguageCards";
-        }
-
-        languageCardCacheService.addCreatedLanguageCard(languageCardCreationForm, userService.getUserId());
-        model.addAttribute("languageCardCreationForm", new LanguageCardCreationForm());
-        model.addAttribute("successfulCreation", "This language card was successful created!");
-        model.addAttribute("createdLanguageCards", languageCardCacheService.getCreatedLanguageCards());
-        return "setLanguageCards";
-    }
-    @GetMapping("/creation")
-    public String createLanguageCard(Model model){
-        LanguageCardCreationForm languageCardCreationForm = new LanguageCardCreationForm();
-        model.addAttribute("languageCardCreationForm", languageCardCreationForm);
-        return "setLanguageCards";
-    }
     @GetMapping("/prepareLanguageCards")
     public String prepareLanguageCard(){
         List<LanguageCard> languageCardsToLearn = languageCardCacheService.getCreatedLanguageCards();
@@ -82,19 +61,7 @@ public class WordsTrainerController {
     }
     @GetMapping
     public String showWordsTrainerPage(){
-        Authentication getAuthentication = SecurityContextHolder.getContext().getAuthentication();
-        if(getAuthentication.isAuthenticated()){
             return "WordsTrainer";
-        }else{
-            return "login";
-        }
-    }
-    @GetMapping("/languageCards")
-    public String showLanguageCardsByUser(Model model) {
-        List<LanguageCard> languageCards = languageCardCacheService.getLanguageCardsByUser();
-        model.addAttribute("languageCardsAmount", languageCards.size());
-        model.addAttribute("languageCardsByUser", languageCards);
-        return "showLanguageCardsByUser";
     }
     @GetMapping("/preStart")
     public String preStart(){
@@ -113,6 +80,7 @@ public class WordsTrainerController {
         TrainingContextDTO trainingDTO = createTrainingDTO(randomLanguageCard);
         List<LanguageCard> languageCards = languageCardContextHolder.getLanguageCardsToLearn();
         model.addAttribute("trainingProgress", wordsTrainerService.calculateProgressPercent(languageCards));
+
         model.addAttribute("trainingData", trainingDTO);
         model.addAttribute("answer", new TranslationModel());
         return "checkTranslation";
@@ -158,8 +126,12 @@ public class WordsTrainerController {
         model.addAttribute("learnedLanguageCards", languageCardList);
         model.addAttribute("mistakesDuringTraining", mistakesDuringTraining);
 
-        languageCardCacheService.addLastLearnedLanguageCards(languageCardList, userService.getUserId());
+        List<LastLearnedLanguageCard> lastLearnedLanguageCards = lastLearnedLanguageCardsService.
+                convertToLastLearnedLanguageCards(languageCardList);
+
+      lastLearnedLanguageCardsService.updateLastLearnedLanguageCards(lastLearnedLanguageCards,(int) userService.getUserId());
         languageCardService.saveLanguageCardList(languageCardList);
+
         languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
         languageCardCacheService.deleteCreatedLanguageCards();
         return "finish";
@@ -186,66 +158,15 @@ public class WordsTrainerController {
     }
     @GetMapping("/repeatLastLearned")
     public String repeatLastLearned(){
-        List<LanguageCard> languageCards = languageCardCacheService.getLastLearnedLanguageCards();
+        int userId = (int) userService.getUserId();
+
+        List<LastLearnedLanguageCard> lastLearnedLanguageCards = lastLearnedLanguageCardsService.
+                findLastLearnedLanguageCards(userId);
+
+        List<LanguageCard> languageCards = lastLearnedLanguageCardsService.convertToLanguageCards(lastLearnedLanguageCards);
       return repeatLanguageCardsOrReturnException(languageCards);
     }
-    @PostMapping("/submitSettings")
-    public String submitSettings(@ModelAttribute("wordsTrainerSettings") WordsTrainerSettings wordsTrainerSettings,
-                                 Model model){
-        wordsTrainerSettings.setUserId(userService.getUserId());
-wordsTrainerSettingsService.setAllSettings(wordsTrainerSettings);
-model.addAttribute("successfulSetting", "Your settings was successful saved!");
-return "wordsTrainerSettings";
-    }
-    @GetMapping("/settings")
-    public String showSettings(Model model){
-        model.addAttribute("wordsTrainerSettings", new WordsTrainerSettings());
-        return "wordsTrainerSettings";
-    }
-    @GetMapping("/search")
-    public String showOperations(){
-        return "LanguageCardOperations";
-    }
- @PostMapping("/search/{type}/{word}")
- public String findLanguageCard(Model model, @PathVariable("type") String type, @PathVariable("word") String value){
-        LanguageCard foundedLanguageCard = languageCardService.searchLanguageCard(type, value);
-        if(foundedLanguageCard != null){
-            model.addAttribute("foundedLanguageCard", foundedLanguageCard);
-        }else{
-            model.addAttribute("nothingFounded",
-                    "Language card with value "+value+"not exist in base");
-        }
-        return "LanguageCardOperations";
- }
- @GetMapping("/editLanguageCard/{id}")
- public String showEditionPage(Model model, @PathVariable("id") int id){
-        LanguageCard languageCard = languageCardService.findLanguageCardByIdAndUserId(id, userService.getUserId());
-        if(languageCard == null){
-            return "redirect:/Home/WordsTrainer/languageCardNotExist";
-        }
-        languageCardCacheService.setLanguageCardToEdit(languageCard);
-        LanguageCardEditForm languageCardEditForm = new LanguageCardEditForm();
-        languageCardEditForm.setWord(languageCard.getWord());
-        languageCardEditForm.setTranslation(languageCard.getTranslation());
-        languageCardEditForm.setId(languageCard.getId());
-        model.addAttribute("languageCardEditForm", languageCardEditForm);
-        return "languageCardEdit";
- }
- @GetMapping("/languageCardNotExist")
- public String notFoundPage(Model model){
-     model.addAttribute("languageCardNotFound", "This language card not exist in base");
-     return "languageCardNotFound";
- }
- @PostMapping("/submitEdit")
- public String submitEdit(@ModelAttribute("languageCardEditForm") LanguageCardEditForm languageCardEditForm){
-        LanguageCard editedLanguageCard = languageCardCacheService.getLanguageCardToEdit();
-       editedLanguageCard.setWord(languageCardEditForm.getWord());
-       editedLanguageCard.setTranslation(languageCardEditForm.getTranslation());
-       editedLanguageCard.setUserId((int) userService.getUserId());
-       languageCardService.updateLanguageCard(editedLanguageCard);
-     languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
-       return "redirect:/Home/WordsTrainer/languageCards";
- }
+
         private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
         long userId = userService.getUserId();
         WordsTrainerSettings wordsTrainerSettings = wordsTrainerSettingsService.getSettingsForUser(userId);
@@ -259,7 +180,6 @@ return "wordsTrainerSettings";
         }
         private String defineFlashCardsTrainingType(String flashCardsTrainingType){
         String baseURL = "redirect:/Home/WordsTrainer/";
-
        return switch(flashCardsTrainingType){
            case "noTraining" -> baseURL + "start";
            case "chooseAnswer" -> baseURL + "flashcards";
@@ -270,17 +190,7 @@ return "wordsTrainerSettings";
        };
 
         }
-        @GetMapping("/delete/{id}")
-        public String deleteLanguageCard(Model model, @PathVariable("id") int id){
-        long userId = userService.getUserId();
-            if(languageCardService.findLanguageCardByIdAndUserId(id, userId) != null){
-                languageCardService.deleteLanguageCardById(id, userId);
-                languageCardCacheService.updateLanguageCardsForUser(userId);
-            }else{
-                System.out.println("This language card not exists");
-            }
-        return "showLanguageCardsByUser";
-        }
+
         @GetMapping("/flashcards")
         public String showFlashCardsPage(){
         return "flashCards";
