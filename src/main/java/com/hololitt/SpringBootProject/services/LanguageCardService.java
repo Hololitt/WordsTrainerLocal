@@ -6,7 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class LanguageCardService {
@@ -23,6 +28,7 @@ public class LanguageCardService {
     public List<LanguageCard> getLanguageCardsByUserId(long userId){
         return languageCardRepository.findByUserId((int) userId);
     }
+    @Transactional
     public void saveLanguageCardList(List<LanguageCard> languageCardList){
         languageCardRepository.saveAll(languageCardList);
     }
@@ -52,15 +58,20 @@ public boolean isLanguageCardExists(String word, String translation){
         return languageCardRepository.existsByWordAndTranslation(word, translation);
 }
     public LanguageCard searchLanguageCard(String searchingType, String value){
-        LanguageCard foundedLanguageCard = null;
-        switch(searchingType){
+       return switch(searchingType){
             case "find by word" ->
-                    foundedLanguageCard = findLanguageCardByWordAndUserId(value,
-                            (int) userService.getUserId());
+                    findLanguageCardByWordAndUserId(value, (int) userService.getUserId());
             case "find by translation" ->
-                    foundedLanguageCard = findLanguageCardByTranslationAndUserId(value,
-                            (int) userService.getUserId());
-        }
-        return foundedLanguageCard;
+                   findLanguageCardByTranslationAndUserId(value, (int) userService.getUserId());
+            default -> throw new IllegalArgumentException();
+        };
+    }
+
+    public Map<LocalDate, Long> getLearnedWordsStats() {
+        return languageCardRepository.findAll().stream()
+                .collect(Collectors.groupingBy(
+                        card -> card.getCreationDate().toLocalDate(),
+                        Collectors.counting()
+                ));
     }
 }

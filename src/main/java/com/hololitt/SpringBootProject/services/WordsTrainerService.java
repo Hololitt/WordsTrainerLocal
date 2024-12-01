@@ -1,6 +1,7 @@
 package com.hololitt.SpringBootProject.services;
 
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
+import com.hololitt.SpringBootProject.enums.TrainingType;
 import com.hololitt.SpringBootProject.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class WordsTrainerService {
     }
 
     public void setTrainingType() {
-        TrainingType trainingType = getTrainingType();
+        TrainingType trainingType = getWordsTrainerSettingsForUser().getTranslationRequestVariety();
         switch (trainingType) {
             case MIX -> languageCardContextHolder.generateRandomValueAndLanguageCard();
             case WORD_TO_TRANSLATION -> languageCardContextHolder.generateRandomLanguageCardAndTranslation();
@@ -44,10 +45,6 @@ public class WordsTrainerService {
             default -> throw new IllegalArgumentException("Unknown training type: " + trainingType);
         }
     }
-private TrainingType getTrainingType(){
-    String type = getWordsTrainerSettingsForUser().getTranslationRequestVariety();
-    return TrainingType.chooseType(type);
-}
     public CheckAnswerDTO checkAnswer(TranslationModel translationModel) {
         String answer = translationModel.getAnswer();
         LanguageCard randomLanguageCard = languageCardContextHolder.getRandomLanguageCard();
@@ -141,21 +138,4 @@ public List<LanguageCard> getRandomLanguageCardsToLearn(){
 
         return (int) (res1 * 100);
     }
-}
- enum TrainingType{
-    MIX("mix"),
-     WORD_TO_TRANSLATION("word to translation"),
-     TRANSLATION_TO_WORD("translation to word");
-private final String value;
-     TrainingType(String value){
-         this.value = value;
-     }
-     public static TrainingType chooseType(String type){
-         for(TrainingType trainingType : TrainingType.values()){
-             if(trainingType.value.equals(type)){
-return trainingType;
-             }
-         }
-         throw new IllegalArgumentException();
-     }
 }

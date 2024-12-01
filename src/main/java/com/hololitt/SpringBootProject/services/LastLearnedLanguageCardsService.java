@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,12 +41,13 @@ public List<LastLearnedLanguageCard> convertToLastLearnedLanguageCards(List<Lang
         languageCard.setId(lc.getId());
         languageCard.setUserId(lc.getUserId());
         languageCard.setMistakesCount(lc.getMistakesCount());
+        languageCard.setLastRepetition(LocalDateTime.now());
         languageCard.setCreationDate(lc.getCreationDate());
 
         return languageCard;
     }).collect(Collectors.toList());
 }
-    public List<LanguageCard> convertToLanguageCards(List<LastLearnedLanguageCard> lastLearnedCards) {
+public List<LanguageCard> convertToLanguageCards(List<LastLearnedLanguageCard> lastLearnedCards) {
         return lastLearnedCards.stream().map(lastCard -> {
             LanguageCard languageCard = new LanguageCard();
 
@@ -56,6 +58,7 @@ public List<LastLearnedLanguageCard> convertToLastLearnedLanguageCards(List<Lang
             languageCard.setUserId(lastCard.getUserId());
             languageCard.setMistakesCount(lastCard.getMistakesCount());
             languageCard.setCreationDate(lastCard.getCreationDate());
+            languageCard.setLastRepetition(LocalDateTime.now());
 
             return languageCard;
         }).collect(Collectors.toList());

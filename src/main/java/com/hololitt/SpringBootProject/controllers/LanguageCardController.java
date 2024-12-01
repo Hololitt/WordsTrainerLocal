@@ -7,15 +7,21 @@ import com.hololitt.SpringBootProject.models.LanguageCardEditForm;
 import com.hololitt.SpringBootProject.services.LanguageCardCacheService;
 import com.hololitt.SpringBootProject.services.LanguageCardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.hololitt.SpringBootProject.services.UserService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/Home/WordsTrainer")
+@SuppressWarnings("unused")
 public class LanguageCardController {
     private final UserService userservice;
     private final LanguageCardService languageCardService;
@@ -70,7 +76,7 @@ public class LanguageCardController {
         return "languageCardEdit";
     }
     @GetMapping("/languageCardNotExist")
-    public String notFoundPage(Model model){
+    public String showNotFoundPage(Model model){
         model.addAttribute("languageCardNotFound", "This language card not exist in base");
         return "languageCardNotFound";
     }
@@ -115,5 +121,12 @@ public class LanguageCardController {
         LanguageCardCreationForm languageCardCreationForm = new LanguageCardCreationForm();
         model.addAttribute("languageCardCreationForm", languageCardCreationForm);
         return "setLanguageCards";
+    }
+    @GetMapping("/learnedWordsStats")
+    public ResponseEntity<Map<LocalDate, Long>> getLearnedWordsStats() {
+       Map<LocalDate, Long> cards = languageCardService.getLearnedWordsStats();
+
+       cards.forEach((localDate, aLong) -> System.out.println(localDate + " " + aLong));
+        return ResponseEntity.ok(languageCardService.getLearnedWordsStats());
     }
 }

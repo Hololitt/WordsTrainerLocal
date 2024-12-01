@@ -1,18 +1,86 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learned Words Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        canvas {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-<span th:text="${username}"></span>
-<h4>Count of learned language cards: <span th:text="${countLanguageCards}"></span></h4>
-<br/>
-<a href="/Home/WordsTrainer/languageCards" class="button-profile">my language cards</a> <br><br/>
+<h1>Learned Words Statistics</h1>
+<canvas id="learnedWordsChart"></canvas>
 
-<a href="/Home/WordsTrainer" class="button-profile">Words Trainer</a> <br><br/>
+<script>
+        // Fetch data from the backend
+        fetch('/Home/WordsTrainer/learnedWordsStats')
+            .then(response => response.json())
+            .then(data => {
+                // Transform data into labels and values for the chart
+                const labels = Object.keys(data); // Dates
+                const values = Object.values(data); // Word counts
 
-<a href="/Home/logout">logout</a>
+                // Render Chart.js
+                const ctx = document.getElementById('learnedWordsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Words Learned',
+                            data: values,
+                            borderColor: '#007BFF',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Words Learned'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
 </body>
 </html>

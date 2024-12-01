@@ -2,6 +2,7 @@ package com.hololitt.SpringBootProject.controllers;
 
 import com.hololitt.SpringBootProject.DTO.CheckAnswerDTO;
 import com.hololitt.SpringBootProject.DTO.TrainingContextDTO;
+import com.hololitt.SpringBootProject.enums.FlashCardsTrainingVariety;
 import com.hololitt.SpringBootProject.models.*;
 import com.hololitt.SpringBootProject.services.*;
 import com.hololitt.SpringBootProject.validators.LanguageCardValidator;
@@ -26,6 +27,7 @@ public class WordsTrainerController {
     private final LanguageCardValidator languageCardValidator;
     private final FlashCardService flashCardService;
     private final LastLearnedLanguageCardsService lastLearnedLanguageCardsService;
+
     @Autowired
     public WordsTrainerController(LanguageCardService languageCardService,
                                   UserService userService,
@@ -35,7 +37,7 @@ public class WordsTrainerController {
                                   WordsTrainerSettingsService wordsTrainerSettingsService,
                                   LanguageCardValidator languageCardValidator, FlashCardService flashCardService,
                                   LastLearnedLanguageCardsService lastLearnedLanguageCardsService
-                                  ){
+    ) {
         this.languageCardService = languageCardService;
         this.userService = userService;
         this.languageCardCacheService = languageCardCacheService;
@@ -46,8 +48,9 @@ public class WordsTrainerController {
         this.flashCardService = flashCardService;
         this.lastLearnedLanguageCardsService = lastLearnedLanguageCardsService;
     }
+
     @GetMapping("/cancelTraining")
-    public String cancelTraining(){
+    public String cancelTraining() {
         languageCardContextHolder.cleanUpContext();
         languageCardCacheService.deleteCreatedLanguageCards();
         languageCardCacheService.deleteSelectedLanguageCardsToRepeat();
@@ -55,28 +58,31 @@ public class WordsTrainerController {
     }
 
     @GetMapping("/prepareLanguageCards")
-    public String prepareLanguageCard(){
+    public String prepareLanguageCard() {
         List<LanguageCard> languageCardsToLearn = languageCardCacheService.getCreatedLanguageCards();
-      return repeatLanguageCardsOrReturnException(languageCardsToLearn);
+        return repeatLanguageCardsOrReturnException(languageCardsToLearn);
     }
+
     @GetMapping
-    public String showWordsTrainerPage(){
-            return "WordsTrainer";
+    public String showWordsTrainerPage() {
+        return "WordsTrainer";
     }
+
     @GetMapping("/preStart")
-    public String preStart(){
+    public String preStart() {
         List<LanguageCard> languageCardsToLearn = languageCardContextHolder.getLanguageCardsToLearn();
-        if(languageCardsToLearn == null){
+        if (languageCardsToLearn == null) {
             return "emptyListException";
-        }else{
+        } else {
             return "redirect:/Home/WordsTrainer/start";
         }
     }
+
     @GetMapping("/start")
-    public String start(Model model){
+    public String start(Model model) {
         wordsTrainerService.setTrainingType();
         LanguageCard randomLanguageCard = languageCardContextHolder.getRandomLanguageCard();
-
+        System.out.println("----------------------- " + languageCardContextHolder.getRandomLanguageCard());
         TrainingContextDTO trainingDTO = createTrainingDTO(randomLanguageCard);
         List<LanguageCard> languageCards = languageCardContextHolder.getLanguageCardsToLearn();
         model.addAttribute("trainingProgress", wordsTrainerService.calculateProgressPercent(languageCards));
@@ -85,8 +91,9 @@ public class WordsTrainerController {
         model.addAttribute("answer", new TranslationModel());
         return "checkTranslation";
     }
+
     private TrainingContextDTO createTrainingDTO(LanguageCard card) {
-      return TrainingContextDTO.builder()
+        return TrainingContextDTO.builder()
                 .randomValue(languageCardContextHolder.getRandomValue())
                 .correctAnswersCount(wordsTrainerService.calculateCorrectAnswersCount(card))
                 .languageCardsToLearnAmount(languageCardContextHolder.getLanguageCardsToLearn().size())
@@ -95,13 +102,14 @@ public class WordsTrainerController {
                         .getCorrectAnswersCountToFinish())
                 .build();
     }
+
     @PostMapping("/checkAnswer")
-    public String checkAnswer(@ModelAttribute("answer") TranslationModel translationModel, Model model){
+    public String checkAnswer(@ModelAttribute("answer") TranslationModel translationModel, Model model) {
         CheckAnswerDTO result = wordsTrainerService.checkAnswer(translationModel);
 
-        String flashTrainingType = wordsTrainerSettingsService.getSettingsForUser(userService.getUserId())
+        FlashCardsTrainingVariety flashTrainingType = wordsTrainerSettingsService.getSettingsForUser(userService.getUserId())
                 .getFlashCardsTrainingVariety();
-        if(result.isRepeatFlashCardsTraining()){
+        if (result.isRepeatFlashCardsTraining()) {
             return defineFlashCardsTrainingType(flashTrainingType);
         }
 
@@ -119,7 +127,7 @@ public class WordsTrainerController {
     }
 
     @GetMapping("/finish")
-    public String finish(Model model){
+    public String finish(Model model) {
         List<LanguageCard> languageCardList = languageCardContextHolder.getLearnedLanguageCards();
         Map<LanguageCard, Integer> mistakesDuringTraining = languageCardContextHolder.getAllMistakesDuringTraining();
 
@@ -129,79 +137,80 @@ public class WordsTrainerController {
         List<LastLearnedLanguageCard> lastLearnedLanguageCards = lastLearnedLanguageCardsService.
                 convertToLastLearnedLanguageCards(languageCardList);
 
-      lastLearnedLanguageCardsService.updateLastLearnedLanguageCards(lastLearnedLanguageCards,(int) userService.getUserId());
+        lastLearnedLanguageCardsService.updateLastLearnedLanguageCards(lastLearnedLanguageCards, (int) userService.getUserId());
         languageCardService.saveLanguageCardList(languageCardList);
 
         languageCardCacheService.updateLanguageCardsForUser(userService.getUserId());
         languageCardCacheService.deleteCreatedLanguageCards();
         return "finish";
     }
+
     @GetMapping("/repeat")
-    public String repeatLanguageCards(){
+    public String repeatLanguageCards() {
         List<LanguageCard> languageCards = languageCardService.getLanguageCardsByUserId(userService.getUserId());
-  return repeatLanguageCardsOrReturnException(languageCards);
+        return repeatLanguageCardsOrReturnException(languageCards);
     }
+
     @GetMapping("/repeatMostDifficult")
-    public String repeatMostDifficult(){
-    List<LanguageCard> languageCards = wordsTrainerService.getMostDifficultLanguageCardsToLearn();
-          return repeatLanguageCardsOrReturnException(languageCards);
+    public String repeatMostDifficult() {
+        List<LanguageCard> languageCards = wordsTrainerService.getMostDifficultLanguageCardsToLearn();
+        return repeatLanguageCardsOrReturnException(languageCards);
     }
+
     @GetMapping("/repeatRecommended")
-    public String startRecommendedTraining(){
+    public String startRecommendedTraining() {
         List<LanguageCard> languageCards = wordsTrainerService.getRecommendedLanguageCardsToLearn();
         return repeatLanguageCardsOrReturnException(languageCards);
     }
+
     @GetMapping("/repeatRandom")
-    public String repeatRandomLanguageCards(){
+    public String repeatRandomLanguageCards() {
         List<LanguageCard> languageCards = wordsTrainerService.getRandomLanguageCardsToLearn();
         return repeatLanguageCardsOrReturnException(languageCards);
     }
+
     @GetMapping("/repeatLastLearned")
-    public String repeatLastLearned(){
+    public String repeatLastLearned() {
         int userId = (int) userService.getUserId();
 
         List<LastLearnedLanguageCard> lastLearnedLanguageCards = lastLearnedLanguageCardsService.
                 findLastLearnedLanguageCards(userId);
 
         List<LanguageCard> languageCards = lastLearnedLanguageCardsService.convertToLanguageCards(lastLearnedLanguageCards);
-      return repeatLanguageCardsOrReturnException(languageCards);
+        return repeatLanguageCardsOrReturnException(languageCards);
     }
 
-        private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
+    private String repeatLanguageCardsOrReturnException(List<LanguageCard> languageCards) {
         long userId = userService.getUserId();
         WordsTrainerSettings wordsTrainerSettings = wordsTrainerSettingsService.getSettingsForUser(userId);
-            if (languageCardValidator.isLanguageCardListValid(languageCards)) {
-                  languageCardContextHolder.cleanUpContext();
-                languageCardContextHolder.setLanguageCardsToLearn(languageCards);
-                languageCardContextHolder.setContext();
-                return defineFlashCardsTrainingType(wordsTrainerSettings.getFlashCardsTrainingVariety());
-            }
-            return "emptyListException";
+        if (languageCardValidator.isLanguageCardListValid(languageCards)) {
+            languageCardContextHolder.cleanUpContext();
+            languageCardContextHolder.setLanguageCardsToLearn(languageCards);
+            languageCardContextHolder.setContext();
+            return defineFlashCardsTrainingType(wordsTrainerSettings.getFlashCardsTrainingVariety());
         }
-        private String defineFlashCardsTrainingType(String flashCardsTrainingType){
+        return "emptyListException";
+    }
+
+    private String defineFlashCardsTrainingType(FlashCardsTrainingVariety flashCardsTrainingVariety) {
         String baseURL = "redirect:/Home/WordsTrainer/";
-       return switch(flashCardsTrainingType){
-           case "noTraining" -> baseURL + "start";
-           case "chooseAnswer" -> baseURL + "flashcards";
-           case "matchWordsWithTranslations" -> baseURL + "flashcards/matching";
-           case "mix" -> baseURL; //will be corrected
-           default -> throw new IllegalArgumentException(
-                   "Illegal argument in flashCardsTrainingType " + "argument: " + flashCardsTrainingType);
-       };
 
-        }
+        return switch (flashCardsTrainingVariety) {
+            case NO_TRAINING -> baseURL + "start";
+            case CHOOSE_ANSWER -> baseURL + "flashcards";
+            case MATCH_WORDS_WITH_TRANSLATIONS -> baseURL + "flashcards/matching";
+            case MIX -> baseURL; //will be corrected
+        };
+    }
 
-        @GetMapping("/flashcards")
-        public String showFlashCardsPage(){
-        return "flashCards";
-        }
     @GetMapping("/repeat/flashcards")
     public ResponseEntity<List<FlashCardTrainingContext>> repeatWithFlashCards() {
         List<LanguageCard> languageCardList = languageCardContextHolder.getLanguageCardsToLearn();
-List<FlashCardTrainingContext> flashCardTrainingContextList = flashCardService.createFlashCardTrainingList(languageCardList);
+        List<FlashCardTrainingContext> flashCardTrainingContextList = flashCardService.createFlashCardTrainingList(languageCardList);
 
         return ResponseEntity.ok(flashCardTrainingContextList);
     }
+
     @GetMapping("/repeat/flashcardsMatching")
     public ResponseEntity<List<FlashCard>> getFlashCardList() {
         List<LanguageCard> languageCardList = languageCardContextHolder.getLanguageCardsToLearn();
@@ -209,8 +218,4 @@ List<FlashCardTrainingContext> flashCardTrainingContextList = flashCardService.c
 
         return ResponseEntity.ok(flashCardList);
     }
-    @GetMapping("/flashcards/matching")
-    public String showFlashCardsMatchingPage(){
-        return "flashCardsMatching";
-    }
-    }
+}

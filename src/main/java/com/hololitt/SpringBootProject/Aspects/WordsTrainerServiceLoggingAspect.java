@@ -20,6 +20,7 @@ public void log(JoinPoint joinPoint){
         String methodName = methodSignature.getName();
         System.out.println("Words Trainer Service: method called " + methodName);
     }
+
 @AfterReturning(pointcut = "execution (* com.hololitt.SpringBootProject.services.WordsTrainerService.*(..))",
         returning = "languageCardList")
     public void logReturningLanguageCards(List<LanguageCard> languageCardList){

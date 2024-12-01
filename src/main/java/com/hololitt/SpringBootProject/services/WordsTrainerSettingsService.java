@@ -1,18 +1,22 @@
 package com.hololitt.SpringBootProject.services;
 
+import com.hololitt.SpringBootProject.enums.FlashCardsTrainingVariety;
+import com.hololitt.SpringBootProject.enums.TrainingType;
+import com.hololitt.SpringBootProject.models.DefaultWordsTrainerSettings;
 import com.hololitt.SpringBootProject.models.WordsTrainerSettings;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class WordsTrainerSettingsService {
-    private final Map<Long, WordsTrainerSettings> userSettingsMap = new HashMap<>();
-    private final int defaultCountCorrectAnswersToFinish = 3;
-    private final int defaultCountLanguageCardsToRepeat = 5;
-    private final String defaultTranslationRequestVariety = "mix";
-    private final String defaultFlashCardsTrainingVariety = "chooseAnswer";
-    private final List<String> allowedValues = Arrays.asList("mix", "translation to word", "word to translation");
+    private final Map<Long, WordsTrainerSettings> userSettingsMap = new ConcurrentHashMap<>();
+    private final int defaultCountCorrectAnswersToFinish = DefaultWordsTrainerSettings.DEFAULT_COUNT_CORRECT_ANSWERS_TO_FINISH;
+    private final int defaultCountLanguageCardsToRepeat = DefaultWordsTrainerSettings.DEFAULT_COUNT_LANGUAGE_CARDS_TO_REPEAT;
+    private final TrainingType defaultTranslationRequestVariety = DefaultWordsTrainerSettings.DEFAULT_TRANSLATION_REQUEST_VARIETY;
+    private final FlashCardsTrainingVariety defaultFlashCardsTrainingVariety =
+            DefaultWordsTrainerSettings.DEFAULT_FLASH_CARDS_TRAINING_VARIETY;
 
     public void setAllSettings(WordsTrainerSettings wordsTrainerSettings) {
         long userId = wordsTrainerSettings.getUserId();
@@ -27,48 +31,38 @@ public class WordsTrainerSettingsService {
     private WordsTrainerSettings validateSettings(WordsTrainerSettings settings) {
         int countCorrectAnswersToFinish = settings.getCorrectAnswersCountToFinish();
         int countLanguageCardsToRepeat = settings.getCountLanguageCardsToRepeat();
-        String translationRequestVariety = settings.getTranslationRequestVariety();
-String flashCardsTrainingVariety = settings.getFlashCardsTrainingVariety();
 
-        countCorrectAnswersToFinish = (countCorrectAnswersToFinish > 0) ? countCorrectAnswersToFinish
-                : defaultCountCorrectAnswersToFinish;
+        TrainingType translationRequestVariety = settings.getTranslationRequestVariety();
+FlashCardsTrainingVariety flashCardsTrainingVariety = settings.getFlashCardsTrainingVariety();
 
-        countLanguageCardsToRepeat = (countLanguageCardsToRepeat > 0) ? countLanguageCardsToRepeat
-                : defaultCountLanguageCardsToRepeat;
+        countCorrectAnswersToFinish = validateCountCorrectAnswersToFinish(countCorrectAnswersToFinish);
 
-        translationRequestVariety = allowedValues.contains(translationRequestVariety) ? translationRequestVariety
-                : defaultTranslationRequestVariety;
+        countLanguageCardsToRepeat = validateCountLanguageCardsToRepeat(countLanguageCardsToRepeat);
 
-try{
-    flashCardsTrainingVariety = FlashCardsTrainingVariety.chooseType(flashCardsTrainingVariety);
-}catch(IllegalArgumentException e){
-    flashCardsTrainingVariety = defaultFlashCardsTrainingVariety;
-}
+        translationRequestVariety = validateTranslationRequestVariety(translationRequestVariety);
+
+        flashCardsTrainingVariety = validateFlashCardsTrainingVariety(flashCardsTrainingVariety);
 
         return new WordsTrainerSettings(countCorrectAnswersToFinish,
                 translationRequestVariety, countLanguageCardsToRepeat, settings.getUserId(), flashCardsTrainingVariety);
     }
 
+    private int validateCountCorrectAnswersToFinish(int countCorrectAnswersToFinish){
+        return (countCorrectAnswersToFinish >= 0) ? countCorrectAnswersToFinish : defaultCountCorrectAnswersToFinish;
+    }
+
+    private int validateCountLanguageCardsToRepeat(int countLanguageCardsToRepeat){
+        return (countLanguageCardsToRepeat >= 0) ? countLanguageCardsToRepeat : defaultCountLanguageCardsToRepeat;
+    }
+
+    private TrainingType validateTranslationRequestVariety(TrainingType trainingType){
+        return (trainingType != null) ? trainingType : defaultTranslationRequestVariety;
+    }
+    private FlashCardsTrainingVariety validateFlashCardsTrainingVariety(FlashCardsTrainingVariety flashCardsTrainingVariety){
+        return (flashCardsTrainingVariety != null) ? flashCardsTrainingVariety : defaultFlashCardsTrainingVariety;
+    }
     private WordsTrainerSettings createDefaultSettings(long userId) {
         return new WordsTrainerSettings(defaultCountCorrectAnswersToFinish,
                 defaultTranslationRequestVariety, defaultCountLanguageCardsToRepeat, userId, defaultFlashCardsTrainingVariety);
-    }
-}
-enum FlashCardsTrainingVariety{
-    MIX("mix"),
-    CHOOSE_ANSWER("chooseAnswer"),
-    MATCH_WORDS_WITH_TRANSLATIONS("matchWordsWithTranslations"),
-    NO_TRAINING("noTraining");
-    private final String type;
-    FlashCardsTrainingVariety(String type){
-        this.type = type;
-    }
-    public static String chooseType(String type){
-        for(FlashCardsTrainingVariety flashCardsTrainingVariety : FlashCardsTrainingVariety.values()){
-            if(flashCardsTrainingVariety.type.equals(type)){
-                return flashCardsTrainingVariety.type;
-            }
-        }
-        throw new IllegalArgumentException("Illegal FlashCardsTrainingVariety type: " + type);
     }
 }
