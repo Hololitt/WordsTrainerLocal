@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Language Cards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #555;
+        }
+        .button-custom {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+        .button-custom:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+       .dark-theme{
+         background-color: #222;
+      color: #eee;
+       }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="/css/buttonStyles.css">
+</head>
+<body>
+<a href="/Home/WordsTrainer" class="button-custom">Words Trainer</a>
+<h1>Learned Language Cards</h1>
+<h3>Language Cards Amount: <span th:text="${languageCardsAmount}">amount</span></h3>
+<table>
+    <thead>
+    <tr>
+        <th>Word</th>
+        <th>Translation</th>
+        <th>Repeat Count</th>
+        <th>Mistakes Count</th>
+        <th>Creation date</th>
+        <th>Last repetition</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="languageCard : ${languageCardsByUser}">
+        <td><span th:text="${languageCard.getWord()}"></span></td>
+        <td><span th:text="${languageCard.getTranslation()}"></span></td>
+        <td><span th:text="${languageCard.getRepeatCount()}"></span></td>
+        <td><span th:text="${languageCard.getMistakesCount()}"></span></td>
+        <td><span th:text="${languageCard.getCreationDate().toLocalDate()}"></span></td>
+        <td><span th:text="${languageCard.getLastRepetition().toLocalDate()}"></span></td>
+        <td><a th:href="@{'/Home/WordsTrainer/editLanguageCard/' + ${languageCard.getId()}}">Edit</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

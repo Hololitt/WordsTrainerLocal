@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/dark-theme.css">
+    <title>Language Cards</title>
+    <style>
+    /* Базовые стили */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom right, #eef2f3, #d8e3e7);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    h1 {
+      text-align: center;
+      color: #004aad;
+      font-size: 2.8rem;
+      margin-bottom: 40px;
+      text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.1);
+      transition: color 0.3s ease;
+    }
+
+    .button-custom {
+      display: inline-block;
+      background: linear-gradient(45deg, #007bff, #00c6ff);
+      color: white;
+      padding: 14px 20px;
+      margin: 10px 0;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+      font-size: 18px;
+      width: 90%;
+      max-width: 400px;
+      user-select: none;
+    }
+
+    .button-custom:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #0056b3, #007bff);
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .column {
+      flex: 1;
+      margin: 0 15px;
+      text-align: center;
+    }
+
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #5a8dee;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar a {
+      padding: 15px;
+      text-decoration: none;
+      font-size: 22px;
+      color: white;
+      display: block;
+      transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      font-size: 36px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .menu-button {
+      font-size: 30px;
+      cursor: pointer;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: none;
+      border: none;
+      color: #004aad;
+      transition: color 0.3s ease;
+    }
+
+    /* Кнопка переключения темы */
+    #buttonThemeId {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 18px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      z-index: 1001;
+    }
+    #buttonThemeId:hover {
+      background-color: #2980b9;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .column {
+        margin: 0 0 20px;
+        width: 100%;
+      }
+
+      .button-custom {
+        width: 90%;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+
+    /* ====== Темная тема ====== */
+  .dark-theme {
+  background: linear-gradient(to bottom right, #111111, #333333);
+  color: #eee;
+}
+
+    .dark-theme h1 {
+      color: #aad4ff;
+      text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.7);
+    }
+.dark-theme body{
+color: grey;
+}
+    .dark-theme .container {
+      background-color: #333 !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+      color: #eee;
+    }
+
+    .dark-theme .button-custom {
+      background: linear-gradient(45deg, #555, #777);
+      color: #eee;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark-theme .button-custom:hover {
+      background: linear-gradient(45deg, #888, #aaa);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .dark-theme .sidebar {
+      background-color: #1a1a1a;
+      box-shadow: 2px 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-theme .sidebar a {
+      color: #ccc;
+    }
+
+    .dark-theme .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-theme .menu-button {
+      color: #aad4ff;
+
+    }
+  </style>
+</head>
+
+<body onclick="closeSidebarOutside(event)">
+<button class="menu-button" onclick="openSidebar()">&#9776;</button>
+
+<div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()">&times;</a>
+    <a href="/Home/profile">Profile</a>
+    <a href="/Home/WordsTrainer/settings">Settings</a>
+    <a href="/Home/logout">Logout</a>
+</div>
+
+<h1>Language Cards</h1>
+
+<div class="container">
+    <div class="column">
+        <a href="/Home/WordsTrainer/creation" class="button-custom">Set Language Cards to Learn</a>
+        <a href="/Home/WordsTrainer/repeat" class="button-custom">Repeat all</a>
+        <a href="/Home/WordsTrainer/repeatMostDifficult" class="button-custom">Repeat most difficult</a>
+        <a href="/Home/WordsTrainer/repeatRecommended" class="button-custom">Repeat recommended</a>
+        <a href="/Home/WordsTrainer/repeatLastLearned" class="button-custom">Repeat last learned</a>
+        <a href="/Home/WordsTrainer/repeatRandom" class="button-custom">Repeat random</a>
+    </div>
+
+    <div class="column">
+        <a href="/Home/WordsTrainer/languageCards" class="button-custom">Show My Language Cards</a>
+        <a href="/Home/WordsTrainer/search" class="button-custom">Search</a>
+        <a href="/Home/stats" class="button-custom">Users stats</a>
+    </div>
+</div>
+
+<script>
+    function openSidebar() {
+      document.getElementById('sidebar').style.width = '250px';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').style.width = '0';
+    }
+
+    function closeSidebarOutside(event) {
+      let sidebar = document.getElementById('sidebar');
+      if (
+        event.target.closest('.sidebar') === null &&
+        event.target.closest('.menu-button') === null
+      ) {
+        closeSidebar();
+      }
+    }
+  </script>
+
+
+<script src="/js/dark-theme-setting.js"></script>
+</body>
+</html>

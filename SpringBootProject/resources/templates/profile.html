@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/dark-theme.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .stats-container {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+<h1>User Statistics</h1>
+<canvas id="learnedWordsChart"></canvas>
+
+<div class="stats-container" id="statsContainer">
+    <p><strong>Total Mistakes:</strong> <span id="totalMistakes">0</span></p>
+    <p><strong>Total Language Cards:</strong> <span id="totalCards">0</span></p>
+</div>
+
+<div class="button-container">
+    <a href="/Home/WordsTrainer" class="btn">Go to Words Trainer</a>
+</div>
+
+<script>
+    fetch('/Home/userStats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalMistakes').textContent = data.totalMistakesCount;
+            document.getElementById('totalCards').textContent = data.countLanguageCards;
+        })
+        .catch(error => console.error('Error fetching profile data:', error));
+
+    fetch('/Home/WordsTrainer/learnedWordsStats')
+        .then(response => response.json())
+        .then(data => {
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+
+            const ctx = document.getElementById('learnedWordsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Words Learned',
+                        data: values,
+                        borderColor: '#007BFF',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#007BFF',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Words Learned'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching learned words stats:', error));
+</script>
+<script src="/js/dark-theme-setting.js"></script>
+</body>
+</html>
+
