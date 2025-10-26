@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Cards - Add New Words</title>
+    <link rel="stylesheet" href="/css/dark-theme.css">
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    color: #007bff;
+}
+
+header p {
+    color: #555;
+}
+
+.form-section, .cards-section, .navigation-section {
+    margin-bottom: 30px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background: #007bff;
+    border: none;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background: #0056b3;
+}
+
+.cards-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.cards-table th, .cards-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.cards-table th {
+    background: #007bff;
+    color: #fff;
+}
+
+.cards-table tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+.cards-table tr:hover {
+    background: #ddd;
+}
+
+.button-custom {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.button-custom:hover {
+    background: #218838;
+}
+
+.messages {
+    margin-top: 15px;
+    color: green;
+    font-weight: bold;
+    text-align: center;
+}
+
+</style>
+<body>
+<div class="container">
+    <header>
+        <h1>Language Card Trainer</h1>
+        <p>Add your language cards</p>
+    </header>
+
+    <section class="form-section">
+        <h2>Add new word</h2>
+        <form class="form-card" th:action="@{/Home/WordsTrainer/submitCreation}" th:method="POST" th:object="${languageCardCreationForm}">
+
+            <label for="word">Word:</label>
+            <input type="text" id="word" th:field="*{word}" required placeholder="enter a word"
+               > <br><br>
+
+            <label for="translation">Translation:</label>
+            <input type="text" id="translation" th:field="*{translation}" required placeholder="enter a translation"
+                 > <br><br>
+
+            <input class="btn-submit" type="submit" value="add">
+        </form>
+        <div class="messages">
+            <span th:text="${languageCardExists}"> </span>
+            <span th:text="${successfulCreation}"></span>
+        </div>
+    </section>
+
+    <section class="cards-section">
+        <h3>Language card creation</h3>
+        <table class="cards-table">
+            <thead>
+            <tr>
+                <th>Word</th>
+                <th>Translation</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="languageCard : ${createdLanguageCards}" th:attr="data-id=${languageCard.id}">
+                <td>
+                    <span th:text="${languageCard.getWord()}" class="word-display"></span>
+                    <input type="text" class="word-edit hidden" th:value="${languageCard.getWord()}">
+                </td>
+                <td>
+                    <span th:text="${languageCard.getTranslation()}" class="translation-display"></span>
+                    <input type="text" class="translation-edit hidden" th:value="${languageCard.getTranslation()}">
+                </td>
+                <td>
+                    <button class="edit-btn" onclick="enableEdit(this)">Edit</button>
+                    <button class="save-btn hidden" onclick="saveEdit(this)">Save</button>
+                    <button class="cancel-btn hidden" onclick="cancelEdit(this)">Cancel</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="navigation-section">
+        <a href="/Home/WordsTrainer/startTraining" class="button-custom">Start training</a>
+        <a href="/Home/WordsTrainer/cancelTraining" class="button-custom">Back to WordsTrainer</a>
+    </section>
+</div>
+
+<style>
+.hidden { display: none; }
+.edit-btn, .save-btn, .cancel-btn {
+    padding: 5px 10px;
+    margin: 2px;
+    cursor: pointer;
+}
+.save-btn { background-color: #28a745; color: white; border: none; border-radius: 4px; }
+.cancel-btn { background-color: #dc3545; color: white; border: none; border-radius: 4px; }
+.edit-btn { background-color: #ffc107; color: black; border: none; border-radius: 4px; }
+.edit-btn:hover { background-color: #e0a800; }
+.save-btn:hover { background-color: #218838; }
+.cancel-btn:hover { background-color: #c82333; }
+</style>
+
+<script>
+    // Включение режима редактирования
+function enableEdit(button) {
+    const row = button.closest('tr');
+    row.querySelector('.word-display').classList.add('hidden');
+    row.querySelector('.translation-display').classList.add('hidden');
+    row.querySelector('.word-edit').classList.remove('hidden');
+    row.querySelector('.translation-edit').classList.remove('hidden');
+    button.classList.add('hidden');
+    row.querySelector('.save-btn').classList.remove('hidden');
+    row.querySelector('.cancel-btn').classList.remove('hidden');
+}
+function saveEdit(button) {
+    const row = button.closest('tr');
+    const oldWord = row.querySelector('.word-display').textContent;
+    const oldTranslation = row.querySelector('.translation-display').textContent;
+    const word = row.querySelector('.word-edit').value;
+    const translation = row.querySelector('.translation-edit').value;
+
+
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
+console.log("CSRF Token:", csrfToken);
+console.log(document.cookie);
+console.log(JSON.stringify(csrfToken));
+
+    const payload = {
+        oldForm: {
+            word: oldWord,
+            translation: oldTranslation
+        },
+        updatedForm: {
+            word: word,
+            translation: translation
+        }
+    };
+
+    fetch('/Home/WordsTrainer/updateCard', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.ok) {
+            row.querySelector('.word-display').textContent = word;
+            row.querySelector('.translation-display').textContent = translation;
+            cancelEdit(button);
+        } else if (response.status === 409) {
+            alert('A card with these values already exists.');
+        } else {
+            alert(`Failed to update the card. Server responded with status: ${response.status}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the card. Please try again later.');
+    });
+}
+
+function getCsrfToken() {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
+
+function cancelEdit(button) {
+    const row = button.closest('tr');
+    row.querySelector('.word-display').classList.remove('hidden');
+    row.querySelector('.translation-display').classList.remove('hidden');
+    row.querySelector('.word-edit').classList.add('hidden');
+    row.querySelector('.translation-edit').classList.add('hidden');
+    row.querySelector('.edit-btn').classList.remove('hidden');
+    row.querySelector('.save-btn').classList.add('hidden');
+    row.querySelector('.cancel-btn').classList.add('hidden');
+}
+
+function openEditModal(word, translation) {
+    document.getElementById('oldWord').value = word;
+    document.getElementById('oldTranslation').value = translation;
+    document.getElementById('newWord').value = word;
+    document.getElementById('newTranslation').value = translation;
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+</script>
+<script src="/js/dark-theme-setting.js"></script>
+</body>
+</html>

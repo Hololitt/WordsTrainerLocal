@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/css/settings.css"/>
+</head>
+<body>
+<h1>Settings</h1>
+<button id="theme-toggle"></button>
+<form th:action="@{/Home/WordsTrainer/submitSettings}" th:method="post" th:object="${wordsTrainerSettings}">
+ <!--   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
+
+    <div class="settings-block">
+        <h2>Learning Requirements</h2>
+        <label for="correctAnswersCountToFinish">Count of correct answers required:</label>
+        <input type="text" id="correctAnswersCountToFinish" th:field="*{correctAnswersCountToFinish}" autocomplete="off"
+               placeholder="default is 3">
+    </div>
+
+    <div class="settings-block">
+        <h2>Training Type</h2>
+        <div class="radio-group">
+            <label><input type="radio" value="MIX" th:field="*{translationRequestVariety}"/> Mix</label>
+            <label><input type="radio" value="WORD_TO_TRANSLATION" th:field="*{translationRequestVariety}"/> Word to Translation</label>
+            <label><input type="radio" value="TRANSLATION_TO_WORD" th:field="*{translationRequestVariety}"/> Translation to Word</label>
+        </div>
+    </div>
+
+    <div class="settings-block">
+        <h2>Flash Cards Training</h2>
+        <div class="radio-group">
+            <label><input type="radio" value="MIX" th:field="*{flashCardsTrainingVariety}"/> Mix</label>
+            <label><input type="radio" value="CHOOSE_ANSWER" th:field="*{flashCardsTrainingVariety}"/> Select Correct Answer</label>
+            <label><input type="radio" value="MATCH_WORDS_WITH_TRANSLATIONS" th:field="*{flashCardsTrainingVariety}"/> Matching</label>
+            <label><input type="radio" value="NO_TRAINING" th:field="*{flashCardsTrainingVariety}"/> Disable Training</label>
+        </div>
+    </div>
+
+    <div class="settings-block">
+        <h2>Language Cards Writing</h2>
+        <div class="radio-group">
+            <label><input type="radio" value="YES" th:field="*{languageCardsWritingEnabled}"/> Enable</label>
+            <label><input type="radio" value="NO" th:field="*{languageCardsWritingEnabled}"/> Disable</label>
+        </div>
+    </div>
+
+    <div class="settings-block">
+        <h2>Repetition Settings</h2>
+        <label for="countLanguageCardsToRepeat">Cards included in repetition:</label>
+        <input type="text" id="countLanguageCardsToRepeat" th:field="*{countLanguageCardsToRepeat}" autocomplete="off"
+               placeholder="default is 5">
+    </div>
+
+        <div class="settings-block">
+            <h2>Correct answers decrement</h2>
+            <div class="radio-group">
+                <label><input type="radio" th:value="true" th:field="*{correctAnswersDecrementIfMistakeEnabled}"/>Enable</label>
+                <label><input type="radio" th:value="false" th:field="*{correctAnswersDecrementIfMistakeEnabled}"/>Disable</label>
+            </div>
+        </div>
+
+    <input type="submit" value="Submit">
+</form>
+
+<span class="success-message" th:text="${successfulSetting}"></span>
+
+<a href="/Home/WordsTrainer" class="button-custom">Back to Words Trainer</a>
+
+<script src="/js/dark-theme.js"></script>
+</body>
+</html>
+
